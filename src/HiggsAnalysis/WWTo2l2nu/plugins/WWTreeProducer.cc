@@ -95,14 +95,14 @@ void WWTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
 
-  //  std::cout << "Fill the Preselected "<<std::endl;
-  // fill preselection output
-  if (dumpPreselInfo_) {
-    Handle<bool> selected;
-    iEvent.getByLabel("preselectionMarker", selected );
-    bool isSelected = *selected;
-    myTreeVariables_.evtPresel = isSelected;
-  }
+//   //  std::cout << "Fill the Preselected "<<std::endl;
+//   // fill preselection output
+//   if (dumpPreselInfo_) {
+//     Handle<bool> selected;
+//     iEvent.getByLabel("preselectionMarker", selected );
+//     bool isSelected = *selected;
+//     myTreeVariables_.evtPresel = isSelected;
+//   }
   
 
   //  std::cout << "Fill the Electrons "<<std::endl;
@@ -132,12 +132,12 @@ void WWTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
 
-  //  std::cout << "Fill the Tracks "<<std::endl;
-  // fill track block
-  if(dumpTracks_) {
-    TrackTreeFiller treeFiller(vertexCollection_, trackCollection_, iEvent, iSetup);
-    treeFiller.TrackFillTree(myTreeVariables_);
-  }
+   //  std::cout << "Fill the Tracks "<<std::endl;
+   // fill track block
+   if(dumpTracks_) {
+     TrackTreeFiller treeFiller(vertexCollection_, trackCollection_, iEvent, iSetup);
+     treeFiller.TrackFillTree(myTreeVariables_);
+   }
 
 
   //  std::cout << "Fill the PVertex "<<std::endl;

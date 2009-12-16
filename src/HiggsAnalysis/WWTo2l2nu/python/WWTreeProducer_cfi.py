@@ -17,13 +17,17 @@ treeProducer = cms.EDFilter("WWTreeProducer",
 
                             
                           mctype = cms.untracked.string('signal'),
-                          electronCollection = cms.InputTag("ambiguityResolvedElectrons"),
+#                          electronCollection = cms.InputTag("ambiguityResolvedElectrons"),
+                          electronCollection = cms.InputTag("isolatedElectrons"),  #preselection
                           ecalBarrelSCCollection = cms.InputTag("correctedHybridSuperClusters"),
                           ecalEndcapSCCollection = cms.InputTag("multi5x5SuperClusters","multi5x5EndcapSuperClusters"),
                           muonCollection = cms.InputTag("isolatedMuons"), # preselection
-                          trackCollection = cms.InputTag("trackCandidates"),
+#                          muonCollection = cms.InputTag("muons"), 
+#                          trackCollection = cms.InputTag("trackCandidates"),
+                          trackCollection = cms.InputTag("generalTracks"),
                           vertexCollection = cms.InputTag("offlinePrimaryVertices"),
                           metCollection = cms.InputTag("muonCorrectedMET"), # preselection
+#                          metCollection = cms.InputTag("met"), 
                           genMetCollection = cms.InputTag("genMetTrue"),    #("genMet"),
                           mcTruthCollection = cms.InputTag("genParticles"),
                             )

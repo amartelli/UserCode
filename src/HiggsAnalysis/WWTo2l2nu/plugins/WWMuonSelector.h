@@ -1,8 +1,6 @@
 #ifndef WWMUONSELECTOR
 #define WWMUONSELECTOR
 
-
-// user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
 
@@ -16,12 +14,13 @@ class WWMuonSelector {
  public:
   explicit WWMuonSelector(const edm::ParameterSet&);
   ~WWMuonSelector();
+
   typedef reco::MuonCollection collection;
   typedef std::vector<reco::MuonRef>::const_iterator const_iterator;
 
-  const_iterator begin() const{return selected_.begin();}
-  const_iterator end() const{return selected_.end();}
-
+  const_iterator begin() const {return selected_.begin();}
+  const_iterator end() const {return selected_.end();}
+  
   void select(edm::Handle<reco::MuonCollection>,const edm::Event&, 
 	      const edm::EventSetup&);
 
@@ -31,9 +30,10 @@ class WWMuonSelector {
  
   std::vector<reco::MuonRef> selected_;
   edm::InputTag muonLabel_;
-  double muonPtMin_;
-  double muonEtaMax_;
-
+  float muonPtMinBarrel_;
+  float muonPtMinEndcap_;
+  float muonPMinEndcap_;
+  float muonEtaMax_;
 };
 
 #endif

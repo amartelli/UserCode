@@ -1,20 +1,28 @@
-#include "DataFormats/EgammaCandidates/interface/GsfElectronIsoCollection.h"
+//#include "HiggsAnalysis/WWTo2l2nu/plugins/EleTrackerIsolationAlgo.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/Candidate/interface/CandAssociation.h"
 #include "HiggsAnalysis/WWTo2l2nu/plugins/WWElectronIsolator.h"
 
 
 WWElectronIsolator::WWElectronIsolator(const edm::ParameterSet& iConfig)
 {
-  selectedElectronsRefLabel_ = iConfig.getParameter<edm::InputTag>("SelectedElectronRefCollectionLabel");
-  trackIsolationProducer_    = iConfig.getParameter<edm::InputTag>("TrackIsolationProducerLabel");
-  doRefCheck_		     = iConfig.getParameter<bool>("doRefCheck");
-  theTrackIsolCut_	     = iConfig.getParameter<double>("TrackIsolCut");
+  theTrackIsolCut_     = iConfig.getParameter<double>("TrackIsolCut");
+  theAbsTrackIsolCut_     = iConfig.getParameter<double>("AbsTrackIsolCut");
+  theCaloIsolCut_     = iConfig.getParameter<double>("CaloIsolCut");
+  theECALIsolCut_     = iConfig.getParameter<double>("ECALIsolCut");
+  //  absolute_                  = iConfig.getParameter<bool>("absolute");
+
+  edm::Service<TFileService> fs;
+
+  m_SumPt_over_Pt_EleTk = fs -> make<TH1F>("SumPt_over_Pt_EleTk", "SumPt_over_Pt_EleTk", 1000,  0., 100.);
+  m_SumPt_EleTk = fs -> make<TH1F>("SumPt_EleTk", "SumPt_EleTk", 1000,  0., 100.);
+  m_SumPt_EleCalo = fs -> make<TH1F>("SumPt_EleCalo", "SumPt_EleCalo", 1000,  0., 100.);
+  m_SumPt_EleEcal = fs -> make<TH1F>("SumPt_EleEcal", "SumPt_EleEcal", 1000,  0., 100.);
 }
 
 
 WWElectronIsolator::~WWElectronIsolator()
-{
-}
+{}
 
 void WWElectronIsolator::select(edm::Handle<reco::GsfElectronCollection> electrons,
                                  const edm::Event& iEvent,
@@ -24,34 +32,37 @@ void WWElectronIsolator::select(edm::Handle<reco::GsfElectronCollection> electro
   using namespace reco;
   using namespace std;
 
+//   if ( !absolute_ && theTrackIsolCut_ > 1.0 ) {
+//     LogWarning("HWWElectronIsolator") << "Requested relative electron tracker isolation with cut: " 
+//                                       << theTrackIsolCut_ << " > 1.0. Possible misconfiguration...";
+//   }
+
   selected_.clear();
-  Handle<RefVector<GsfElectronCollection> > electronsRef;
-  //  std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBB  sono in  WWElectronIsolator::select " << std::endl;
-
-  edm::Handle< edm::ValueMap<double> > tkIsolationHandle;
-  try { iEvent.getByLabel(trackIsolationProducer_, tkIsolationHandle); }
-  catch ( cms::Exception& ex ) { printf("Can't get tracker isolation product\n"); }
-
-  const edm::ValueMap<double>& tkIsolationVal = *tkIsolationHandle;
-
-  if(doRefCheck_ == true)
-    iEvent.getByLabel(selectedElectronsRefLabel_,electronsRef);
-
-  for(unsigned i =0; i<electrons->size(); i++) {
+  
+  for(unsigned i =0; i<electrons->size(); ++i) {
     
-    Ref<reco::GsfElectronCollection> electronRAWRef(electrons,i);
-    double sumPtOverEt = tkIsolationVal[electronRAWRef];
-     
-    bool selected = true;
-    if(doRefCheck_ == true) {
-      if (find(electronsRef->begin(), electronsRef->end(),electronRAWRef)==electronsRef->end()) {
-	selected = false;
-      }
-    }
+    Ref<reco::GsfElectronCollection> electronRef(electrons,i);
+    double pt = electronRef->pt();
+    double sumPt = electronRef->dr03TkSumPt();
+    double sumPt_o_Pt = electronRef->dr03TkSumPt() / pt;
+    double sumEcal = electronRef->dr03EcalRecHitSumEt();
+    double sumHcal = electronRef->dr03HcalTowerSumEt();
 
-    //    std::cout << "sumPtOverEt =  " << sumPtOverEt << "  mentre theTrackIsolCut_ =  " << theTrackIsolCut_ << std::endl; 
+    m_SumPt_EleTk ->Fill(sumPt);
+    m_SumPt_over_Pt_EleTk->Fill(sumPt_o_Pt);
+    m_SumPt_EleCalo ->Fill(sumEcal+sumHcal);
+    m_SumPt_EleEcal->Fill(sumEcal);
 
-    if (sumPtOverEt < theTrackIsolCut_ && selected == true)
-      selected_.push_back(electronRAWRef);
+    if ( sumPt > theAbsTrackIsolCut_ ) continue;
+    if ( sumPt_o_Pt > theTrackIsolCut_ ) continue;
+    if ( sumEcal > theECALIsolCut_ ) continue;
+    if ( sumHcal > theCaloIsolCut_ ) continue;
+
+
+    selected_.push_back(electronRef);
+
+   
+
+
   }
 }

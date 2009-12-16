@@ -4,48 +4,52 @@
 #include "DataFormats/MuonReco/interface/Muon.h"
 
 
-WWMuonSelector::WWMuonSelector(const edm::ParameterSet& iConfig)
+WWMuonSelector::WWMuonSelector(const edm::ParameterSet& pset)
 {
-
-  // muonLabel_                 = iConfig.getParameter<edm::InputTag>("MuonLabel");
-  muonPtMin_    = iConfig.getParameter<double>("MuonPtMin");
-  muonEtaMax_    = iConfig.getParameter<double>("MuonEtaMax");
-
-  //register your products
-  // produces<reco::MuonCollection>("");
+  muonPtMinBarrel_  = pset.getParameter<double>("muonPtMinBarrel");
+  muonPtMinEndcap_  = pset.getParameter<double>("muonPtMinEndcap");
+  muonPMinEndcap_   = pset.getParameter<double>("muonPMinEndcap");
+  muonEtaMax_       = pset.getParameter<double>("muonEtaMax");
 }
 
 
 WWMuonSelector::~WWMuonSelector()
-{
+{}
 
-}
 
-// ------------ method called to produce the data  ------------
-void
-WWMuonSelector::select(edm::Handle<reco::MuonCollection> muons,
+void WWMuonSelector::select(edm::Handle<reco::MuonCollection> muons,
                         const edm::Event& iEvent,
                         const edm::EventSetup& iEventSetup)
 {
   using namespace edm;
   using namespace reco;
   selected_.clear();
-  //iEvent.getByLabel(muonLabel_,muons);
 
-  //std::auto_ptr<reco::MuonCollection> pOutMuons(new reco::MuonCollection);
+  //  std::cout << " WWMuonSelector::select " << muons->size() << std::endl;
 
-  for(unsigned int i=0; i<muons->size();i++)
+
+  for(unsigned int i=0; i<muons->size(); ++i)
     {
-      if((*muons)[i].pt()<=muonPtMin_ || fabs((*muons)[i].eta())>=muonEtaMax_) 
-	continue;
+      bool isEndcap = false;
+      bool isBarrel = false;
+      
+      if ( fabs( (*muons)[i].eta() ) > muonEtaMax_ ) continue;
+      if ( fabs( (*muons)[i].eta() ) < 1.1 ) {
+	isBarrel = true;
+      } else {
+	isEndcap = true;
+      }
+
+      if ( isEndcap && ( (*muons)[i].pt() < muonPtMinEndcap_ ||
+			 (*muons)[i].p() < muonPMinEndcap_ )) continue;
+      if ( isBarrel && (*muons)[i].pt() < muonPtMinBarrel_ ) continue;
+      
       Ref<MuonCollection> muonRef(muons,i);
       selected_.push_back(muonRef);
-
-      //  pOutMuons->push_back(*iter); 
     }
-  
-  //   iEvent.put(pOutMuons,"");
+ 
 }
 
+ 
 //define this as a plug-in
 //DEFINE_FWK_MODULE(WWMuonSelector);

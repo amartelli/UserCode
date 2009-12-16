@@ -25,9 +25,8 @@ class WWElectronSelector  {
  private:
 
   edm::InputTag electronIdCutsLabel_;
-  edm::InputTag electronIdLikelihoodLabel_;
-  bool useCuts_;
-  double likelihoodThreshold_;
+  float elecPtMin_;
+  float elecEtaMax_;
 
   std::vector<reco::GsfElectronRef> selected_ ;
 

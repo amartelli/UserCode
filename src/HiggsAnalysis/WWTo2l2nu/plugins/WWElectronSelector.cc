@@ -1,7 +1,6 @@
 // system include files
 #include <memory>
 
-// user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
 
@@ -19,9 +18,8 @@
 WWElectronSelector::WWElectronSelector(const edm::ParameterSet& iConfig)
 {
   electronIdCutsLabel_ = iConfig.getParameter<edm::InputTag>("electronIdCutsLabel");
-  //  electronIdLikelihoodLabel_ = iConfig.getParameter<edm::InputTag>("electronIdLikelihoodLabel"); 
-  useCuts_ = iConfig.getParameter<bool>("useCuts");
-  //  likelihoodThreshold_ = iConfig.getUntrackedParameter<double>("likelihoodThreshold",-1.); //0.5 
+  elecPtMin_   = iConfig.getParameter<double>("electronPtMin");
+  elecEtaMax_  = iConfig.getParameter<double>("electronEtaMax");
 }
 
 
@@ -39,38 +37,25 @@ WWElectronSelector::select (edm::Handle<reco::GsfElectronCollection> electrons,
   using namespace reco;
   selected_.clear();
 
-  std::vector<edm::Handle<edm::ValueMap<float> > > eIDValueMap(2);
+  edm::Handle< edm::ValueMap<float> >  eIDValueMap;  
+  if( iEvent.getByLabel( electronIdCutsLabel_ , eIDValueMap )){
+
+  const edm::ValueMap<float> & eIdmapCuts = * eIDValueMap ;
   
-  if( iEvent.getByLabel( electronIdCutsLabel_ , eIDValueMap[0] )){
+  // Loop over electrons
+  for (unsigned int i = 0; i < electrons->size(); i++) {	  
+    Ref<reco::GsfElectronCollection> electronRef(electrons,i);
+    if (electronRef->pt() >= elecPtMin_ && fabs(electronRef->eta()) < elecEtaMax_){
 
-
-//   if( iEvent.getByLabel( electronIdCutsLabel_ , eIDValueMap[0] )  &&
-//       iEvent.getByLabel( electronIdLikelihoodLabel_ , eIDValueMap[1] ) ) {
-
-    const edm::ValueMap<float> & eIdmapCuts = * eIDValueMap[0] ;
-    //    const edm::ValueMap<float> & eIdmapLikelihood = * eIDValueMap[1] ;
-
-    // Loop over electrons
-    for (unsigned int i = 0; i < electrons->size(); i++) {	  
-      Ref<reco::GsfElectronCollection> electronRef(electrons,i);
       bool eleid = false;
-
-      if( useCuts_ ) {
-	if( eIdmapCuts[electronRef] > -1. )   // 0.
-	  eleid = true;
-      }
-      //else {
-      //	float likelihood = eIdmapLikelihood[electronRef];
-      //	if( likelihood > likelihoodThreshold_ ) eleid = true;
-      //      }
+      if( eIdmapCuts[electronRef] > -1 ) eleid = true; //0
       
-      if (eleid==true)
-	selected_.push_back (electronRef);
-      
+      if (eleid == true) selected_.push_back (electronRef);
     }
-  } else {
-    LogWarning("WWElectronSelector") << electronIdCutsLabel_ << " or " << electronIdLikelihoodLabel_ << " not available";
   }
-
+  } else {
+    LogWarning("WWElectronSelector") << electronIdCutsLabel_ << " not available";
+  }
+  
 }
 

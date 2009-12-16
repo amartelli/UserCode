@@ -1,11 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
 isolatedElectronsRef = cms.EDFilter("WWElectronIsolationRef",
-                                    src = cms.InputTag("gsfElectrons"),
-                                    #src = cms.InputTag("selectedElectrons"),
-                                    SelectedElectronRefCollectionLabel = cms.InputTag("selectedElectronsRef"),
-                                    TrackIsolationProducerLabel = cms.InputTag("egammaTrackerIsolationLoose"),
-                                    TrackIsolCut = cms.double(0.1),
-                                    doRefCheck = cms.bool(True)
+                                    src = cms.InputTag("selectedElectrons"),
+                                    TrackIsolCut = cms.double(100.0), # GeV: absolute isolation     ? 20
+                                    AbsTrackIsolCut = cms.double(100.0), # GeV: absolute isolation     ? 6
+                                    CaloIsolCut = cms.double(100.0), # GeV: absolute isolation     ? 10
+                                    ECALIsolCut = cms.double(100.0), # GeV: absolute isolation     ? 10
+                                    #                                 absolute = cms.bool(True)
                                     )
 

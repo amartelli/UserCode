@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 isolatedMuons = cms.EDFilter("WWMuonIsolation",
-                             src = cms.InputTag("muons"),
+                             src = cms.InputTag("selectedMuons"),
                              SelectedMuonRefCollectionLabel = cms.InputTag("selectedMuonsRef"),
 
                              # isolation parameters
@@ -9,9 +9,9 @@ isolatedMuons = cms.EDFilter("WWMuonIsolation",
                              ecalIsoDepositLabel = cms.InputTag("muGlobalIsoDepositCalByAssociatorTowers","ecal"),
                              trackerIsoDepositLabel = cms.InputTag("muGlobalIsoDepositCtfTk"),
 
-                             trackIsolCut = cms.double(20.), #10
-                             caloIsolCut = cms.double(20.), #10
-                             doRefCheck = cms.bool(True)
+                             trackIsolCut = cms.double(100.), #10
+                             caloIsolCut = cms.double(100.), #10
+                             doRefCheck = cms.bool(True),
                              )
 
 

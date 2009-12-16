@@ -2,6 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('WWPreselection')
 
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.threshold = 'INFO'
+
 # import of standard configurations
 process.load('Configuration/StandardSequences/Services_cff')
 process.load('FWCore/MessageService/MessageLogger_cfi')
@@ -10,23 +13,9 @@ process.load('Configuration/StandardSequences/GeometryPilot2_cff')
 process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 
 # --- common preselection code ---
+#process.load("HiggsAnalysis.WWTo2l2nu.WZMcEventFilter_cfi")
 process.load("HiggsAnalysis.WWTo2l2nu.WWPreselectionSequence_cff")
-
-# --- common code to comput gg fusion signal k factor
-process.load("HiggsAnalysis.WWTo2l2nu.WWKFactorProducer_cfi")
-
-# --- jet met sequences ---
-#process.load("HiggsAnalysis.WWTo2l2nu.jetProducerSequence_cff")
-#process.load("HiggsAnalysis.WWTo2l2nu.metProducerSequence_cff")
-
-# --- electron sequences ---
-process.load("RecoEgamma.EgammaIsolationAlgos.eleIsolationSequence_cff")
-process.load("HiggsAnalysis.WWTo2l2nu.ambiguityResolvedElectrons_cfi")
-process.ambiguityResolvedElectrons.reducedElectronsRefCollectionLabel = "isolatedElectronsRef"
-process.ambiguityResolvedElectrons.doRefCheck = True 
-
-# --- track sequences ---
-process.load("HiggsAnalysis.WWTo2l2nu.trackCandidates_cfi")
+process.McEventFilter.mctype = 'signal'
 
 # --- tree producer ---
 process.load("HiggsAnalysis.WWTo2l2nu.WWTreeProducer_cfi")
@@ -34,8 +23,7 @@ process.treeProducer.nameFile = 'WZ_3l-ReducedTree_04_12_09.root'
 process.treeProducer.nameTree = 'WZAnalysis'
 process.treeProducer.mctype = 'signal'
 process.treeProducer.dumpPreselInfo = True
-#process.treeProducer.dumpGenInfo = False
-process.treeProducer.dumpTracks = True
+process.treeProducer.dumpTracks = False
 process.treeProducer.dumpVertices = True
 
 
@@ -51,28 +39,31 @@ process.source = cms.Source("PoolSource",
     )
                             )
 
-#process.TFileService = cms.Service("TFileService",
-#                                   fileName = cms.string('histos.root')
-#                                   )
-
-process.out = cms.OutputModule("PoolOutputModule",
-                               verbose = cms.untracked.bool(False),
-                               fileName = cms.untracked.string('WZ_3l-ReducedTree_02_12_09.root'),
-                               outputCommands = cms.untracked.vstring(
-    'keep *'
+process.TFileService = cms.Service(
+    "TFileService",
+    fileName = cms.string("efficiencies_signal.root"),
+    closeFileFast = cms.untracked.bool(True)
     )
-                               )
+
+
+#process.out = cms.OutputModule("PoolOutputModule",
+#                               verbose = cms.untracked.bool(False),
+#                               fileName = cms.untracked.string('WZ_3l-ReducedTree_02_12_09.root'),
+#                               outputCommands = cms.untracked.vstring(
+#    'keep *'
+#    )
+#                               )
 
 
 
-process.p = cms.Path ( process.KFactorProducer *
-                       process.WWTo2l2nuPreselectionSequence *
-                       process.eleIsolationSequence *
-                       process.ambiguityResolvedElectrons *
-                       process.trackCandidates 
-			)
+#process.p = cms.Path ( #process.KFactorProducer *
+#                       process.WWTo2l2nuPreselectionSequence 
+#                      #process.eleIsolationSequence *
+#                      # process.ambiguityResolvedElectrons 
+#                      #process.trackCandidates 
+#			)
 
 
 
-process.o = cms.EndPath ( process.treeProducer)
+process.o = cms.EndPath ( process.WWTo2l2nuPreselectionSequence* process.treeProducer)
 

@@ -622,7 +622,7 @@ void BinnedFitZPeak(const std::string& category, const int& rebin, TH1F* h_mZ, c
                     int nPoints, const double &min,const double &max, std::string energyType ){
 
   std::cout << " BinnedFitZPeak fitting category: " << category << " type = " << type << " reg = " << energyType <<  std::endl;
-
+ 
   nPoint = nPoints;
   mZ_min = min;
   mZ_max = max;
@@ -678,8 +678,8 @@ void BinnedFitZPeak(const std::string& category, const int& rebin, TH1F* h_mZ, c
   std::string funcName = "bw_cb_" + category+"_"+energyType;
 
 
-  if(category == "EE-EE" || category == "EEp" || category == "EEm" || category=="EE_R9_g" || category=="EE_R9_l" || 
-     category=="EE_Eta_l" || category=="EE_Eta_g" ){
+  if(category == "EE-EE" || category == "EEp" || category == "EEm" || category=="EE-R9-g" || category=="EE-R9-l" || 
+     category=="EE-Eta-l" || category=="EE-Eta-g" ){
    TF1* bw_cb = new TF1(funcName.c_str(),breitWigner_crystalBallLow,mZ_min,mZ_max,7);
    bw_cb -> SetNpx(10000);
    bw_cb -> SetLineColor(iStyle);
@@ -698,7 +698,7 @@ void BinnedFitZPeak(const std::string& category, const int& rebin, TH1F* h_mZ, c
    bw_cb -> Draw("same"); 
   }
   
-if(category == "EB-EE" || category=="EB_R9_l" ){
+if(category == "EB-EE" || category=="EB-R9-l" ){
    TF1* bw_cb = new TF1(funcName.c_str(),breitWigner_crystalBallLow,mZ_min,mZ_max,7);
    bw_cb -> SetNpx(10000);
    bw_cb -> SetLineColor(iStyle);
@@ -716,7 +716,7 @@ if(category == "EB-EE" || category=="EB_R9_l" ){
      bw_cb -> Draw("same"); 
  }
 
-if(category == "EB-EB" || category == "EBp" || category == "EBm" || category=="EB_R9_g" || category=="EB_Eta_l" || category=="EB_Eta_g"){
+if(category == "EB-EB" || category == "EBp" || category == "EBm" || category=="EB-R9-g" || category=="EB-Eta-l" || category=="EB-Eta-g"){
    TF1* bw_cb = new TF1(funcName.c_str(),breitWigner_crystalBallLow,mZ_min,mZ_max,7);
    bw_cb -> SetNpx(10000);
    bw_cb -> SetLineColor(iStyle);
@@ -750,9 +750,12 @@ if(category == "EB-EB" || category == "EBp" || category == "EBm" || category=="E
   // ---------------
   // print the plots
 
+//  std::cout << " file -> " << ("output/summaryPlots_"+type+"/"+h_mZ_Name+".png") << std::endl;
+
+//  std::cout << " file -> " << ("output/summaryPlots_"+type+"/"+h_mZ_Name+".png").c_str() << std::endl;
  c->Print(("output/summaryPlots_"+type+"/"+h_mZ_Name+".png").c_str(),"png");
- delete c;
- 
+
+ delete c; 
 }
 
 

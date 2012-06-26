@@ -18,7 +18,9 @@
 #include "TVirtualFitter.h"
 #include "TMath.h"
 
+#include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <sstream>
 #include <ctime>
@@ -31,9 +33,10 @@
 #define a 0.5346
 #define b 0.2166
 #define FWHMZ 2.4952
+#define precision 0.001
  
 #define NormalizationReReco  995487.
-#define NormalizationPrompt  1.
+#define NormalizationPrompt  723623.
 #define NormalizationMC 1603411.
 
 int main(int argc, char **argv){
@@ -331,18 +334,18 @@ int main(int argc, char **argv){
    if( (ele1_seedZside == 1) && (ele2_seedZside == 1)) eventCategory.push_back("EEp");
    else if( (ele1_seedZside == -1) && (ele2_seedZside == -1)) eventCategory.push_back("EEm");
 
-   if( (ele1_seedZside != 0) && (ele2_seedZside != 0) && ele1_R9 > 0.94 && ele2_R9 > 0.94) eventCategory.push_back("EE_R9_g");
-   else if( (ele1_seedZside != 0) && (ele2_seedZside != 0) && ele1_R9 < 0.94 && ele2_R9 < 0.94) eventCategory.push_back("EE_R9_l");
+   if( (ele1_seedZside != 0) && (ele2_seedZside != 0) && ele1_R9 > 0.94 && ele2_R9 > 0.94) eventCategory.push_back("EE-R9-g");
+   else if( (ele1_seedZside != 0) && (ele2_seedZside != 0) && ele1_R9 < 0.94 && ele2_R9 < 0.94) eventCategory.push_back("EE-R9-l");
 
-   if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && ele1_R9 > 0.94 && ele2_R9 > 0.94) eventCategory.push_back("EB_R9_g");
-   else if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && ele1_R9 < 0.94 && ele2_R9 < 0.94)eventCategory.push_back("EB_R9_l");
+   if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && ele1_R9 > 0.94 && ele2_R9 > 0.94) eventCategory.push_back("EB-R9-g");
+   else if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && ele1_R9 < 0.94 && ele2_R9 < 0.94)eventCategory.push_back("EB-R9-l");
    
-   if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && fabs(ele1_scEta) < 1. && fabs(ele2_scEta) < 1. ) eventCategory.push_back("EB_Eta_l");
-   else if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && fabs(ele1_scEta) > 1. && fabs(ele2_scEta) > 1. ) eventCategory.push_back("EB_Eta_g");
+   if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && fabs(ele1_scEta) < 1. && fabs(ele2_scEta) < 1. ) eventCategory.push_back("EB-Eta-l");
+   else if( (ele1_seedZside == 0) && (ele2_seedZside == 0) && fabs(ele1_scEta) > 1. && fabs(ele2_scEta) > 1. ) eventCategory.push_back("EB-Eta-g");
 
-   if( (fabs(ele1_seedZside) == 1) && (fabs(ele2_seedZside) == 1) && fabs(ele1_scEta) < 2. && fabs(ele2_scEta) < 2. ) eventCategory.push_back("EE_Eta_l");
+   if( (fabs(ele1_seedZside) == 1) && (fabs(ele2_seedZside) == 1) && fabs(ele1_scEta) < 2. && fabs(ele2_scEta) < 2. ) eventCategory.push_back("EE-Eta-l");
    else if( (fabs(ele1_seedZside) == 1) && (fabs(ele2_seedZside) == 1) && 
-	    fabs(ele1_scEta) > 2. && fabs(ele2_scEta) > 2. ) eventCategory.push_back("EE_Eta_g");
+	    fabs(ele1_scEta) > 2. && fabs(ele2_scEta) > 2. ) eventCategory.push_back("EE-Eta-g");
 
    
    for(unsigned int i=0; i<FitCategories.size(); ++i){
@@ -420,13 +423,23 @@ int main(int argc, char **argv){
 
  /// Z Lineshape Tool
 if(allOthers){
-  std::string nameTable = outputTable+"_"+type+"_vsCategories.txt";
+  std::string nameTable = outputTable+"_"+type+"_vsCategories.tex";
    std::ofstream outTableFile (nameTable.c_str(),std::ios::out);
 
-   outTableFile<<"\\begin{table}[!htb]"<<std::endl;
-   outTableFile<<"\\begin{center}"<<std::endl;
+   outTableFile << " \\documentclass[10pt,a4paper]{article} " << std::endl;
+   outTableFile << " \\usepackage[latin1]{inputenc} " << std::endl;
+   outTableFile << " \\usepackage[left=1.in,right=1.in,top=1in,bottom=1.in]{geometry}" << std::endl;
+   outTableFile << " \\usepackage{amsmath}" << std::endl;
+   outTableFile << " \\usepackage{amsfonts}" << std::endl;
+   outTableFile << " \\usepackage{amssymb}" << std::endl;
+   outTableFile << " \\usepackage{rotating}" << std::endl;
 
-   outTableFile<<"\\begin{tabular}{c|c|c|c|c|c}"<<std::endl;
+   outTableFile << " \\begin{document}" << std::endl;
+
+   outTableFile << " \\begin{table}[!htb]"<<std::endl;
+   outTableFile<<"\\begin{center}"<<std::endl;
+   outTableFile<<"\\footnotesize"<<std::endl;
+   outTableFile<<"\\begin{tabular}{c|c|c|c|c|c|c}"<<std::endl;
 
    outTableFile<<"\\hline"<<std::endl;
    outTableFile<<"\\hline"<<std::endl;
@@ -434,9 +447,9 @@ if(allOthers){
    outTableFile << " & " << " & " << " & " << " & " << " & " << " \\\\ " <<std::endl;
 
    outTableFile << " Category " << " & " << " type " << " & " << " Event " << " & " 
-		<< "$ \\Delta M_" << type << "}$ " << " & " 
-		<< "\\sigma_{cb}^{" << type << "}/" <<  "\\Delta M_{" << type << "}$ " << " & "
-		<< "\\sigma_{OL}^{" << type << "}/" <<  "\\Delta M_{" << type << "}$ " << " \\\\ " << std::endl; 
+		<< "$ \\Delta M_{" << type << "}$ " << " & " 
+		<< "$\\frac{\\sigma_{cb}^{" << type << "}}{" <<  "\\Delta M_{" << type << "} }$ " << " & "
+		<< "$\\frac{\\sigma_{OL}^{" << type << "}}{" <<  "\\Delta M_{" << type << "} }$ " << " \\\\ " << std::endl; 
 
 
    outTableFile << " & " << " & " << " & " << " & " << " & " << " \\\\ " <<std::endl;
@@ -458,30 +471,33 @@ if(allOthers){
      std::string funcName = "bw_cb_"+cat+"_"+energyType;
      std::pair<double,double> extreme = 
        breitWigner_crystalBallLowFWHM(Zmass_regression[cat]->GetFunction(funcName.c_str()), mZ_Min,mZ_Max);
-     double sigma = sqrt(TMath::Power(((extreme.second-extreme.first)-a*FWHMZ),2)-b*FWHMZ*FWHMZ)/(2.*sqrt(2.*log(2.)));
+     //     double sigma = sqrt(TMath::Power(((extreme.second-extreme.first)-a*FWHMZ),2)-b*FWHMZ*FWHMZ)/(2.*sqrt(2.*log(2.)));
+     double sigma = olivieroLongbothan(extreme.first, extreme.second).first;
 
      outTableFile << " & " << " & " << " & " << " & " << " & " << " \\\\ " <<std::endl;
 
   int Entries = Zmass_regression[cat]->GetEntries(); 
   float DM = Zmass_regression[cat]->GetFunction(funcName.c_str())->GetParameter(3);
   float DM_err = Zmass_regression[cat]->GetFunction(funcName.c_str())->GetParError(3);
+
   float Scb = Zmass_regression[cat]->GetFunction(funcName.c_str())->GetParameter(4);
   float Scb_err = Zmass_regression[cat]->GetFunction(funcName.c_str())->GetParError(4);
-  float Sol_err = (0.001 *(extreme.second-extreme.first - a*FWHMZ*FWHMZ) / 2. /
-		      (sqrt( 2.*log(2) * ( pow(extreme.second-extreme.first - a*FWHMZ*FWHMZ, 2) - b*FWHMZ*FWHMZ )) ) );
+  float Sol_err = olivieroLongbothan(extreme.first, extreme.second).second;
+
+  float ScboM = Scb/(91.18+DM);
+  float ScboM_err = sqrt( pow(Scb_err * (91.18+DM), 2) + pow(Scb * DM_err, 2) ) / pow(91.18+DM, 2);
+  float SoloM = sigma/(91.18+DM);
+  float SoloM_err = sqrt( pow(Sol_err * (91.18+DM), 2) + pow(sigma * DM_err, 2) ) / pow(91.18+DM, 2);
 
   outTableFile << cat << "-" << energyType << " & " << type << " & "<< Entries << " & " 
-	       << DM << " $\\pm$ " << DM_err << " & "  
-	       << Scb / (91.18+DM) << " & " 
-	       << sigma / (91.18+DM) <<  " \\\\ " <<std::endl;
+	       << std::setw(4) << DM << " $\\pm$ " << std::setw(4) << DM_err << " & "  
+	       << std::setw(5) << ScboM << " $\\pm$ " << std::setw(5) << ScboM_err << " & " 
+	       << std::setw(5) << SoloM << " $\\pm$ " << std::setw(5) << SoloM_err << " \\\\ " <<std::endl;
      
 
-  Zscale->SetBinContent(i+1, DM);
-  Zscale->SetBinError(i+1, DM_err);
-  ZScb->SetBinContent(i+1, Scb / (91.18+DM));
-  ZScb->SetBinError(i+1, sqrt(Scb_err*Scb_err + DM_err*DM_err) / (91.18+DM) );
-  ZSol->SetBinContent(i+1, sigma / (91.18+DM));
-  ZSol->SetBinError(i+1, sqrt(Sol_err*Sol_err + DM_err*DM_err) / (91.18+DM));
+  Zscale->SetBinContent(i+1, DM);     Zscale->SetBinError(i+1, DM_err);
+  ZScb->SetBinContent(i+1, ScboM);    ZScb->SetBinError(i+1, ScboM_err);
+  ZSol->SetBinContent(i+1, SoloM);    ZSol->SetBinError(i+1, SoloM_err);
 
   energyType = "NoReg";
 
@@ -490,7 +506,8 @@ if(allOthers){
   
   funcName = "bw_cb_"+cat+"_"+energyType;
   extreme = breitWigner_crystalBallLowFWHM(Zmass[cat]->GetFunction(funcName.c_str()), mZ_Min,mZ_Max);
-  sigma = sqrt(TMath::Power(((extreme.second-extreme.first)-a*FWHMZ),2)-b*FWHMZ*FWHMZ)/(2.*sqrt(2.*log(2.)));
+  sigma = olivieroLongbothan(extreme.first, extreme.second).first;
+  //  sigma = sqrt(TMath::Power(((extreme.second-extreme.first)-a*FWHMZ),2)-b*FWHMZ*FWHMZ)/(2.*sqrt(2.*log(2.)));
 
 
   outTableFile << " & " << " & " << " & " << " & " << " & " << " \\\\ " <<std::endl;
@@ -498,12 +515,20 @@ if(allOthers){
   Entries = Zmass[cat]->GetEntries(); 
   DM = Zmass[cat]->GetFunction(funcName.c_str())->GetParameter(3);
   DM_err = Zmass[cat]->GetFunction(funcName.c_str())->GetParError(3);
+
   Scb = Zmass[cat]->GetFunction(funcName.c_str())->GetParameter(4);
+  Scb_err = Zmass[cat]->GetFunction(funcName.c_str())->GetParError(4);
+  Sol_err = olivieroLongbothan(extreme.first, extreme.second).second;
+
+  ScboM = Scb/(91.18+DM);
+  ScboM_err = sqrt( pow(Scb_err * (91.18+DM), 2) + pow(Scb * DM_err, 2) ) / pow(91.18+DM, 2);
+  SoloM = sigma/(91.18+DM);
+  SoloM_err = sqrt( pow(Sol_err * (91.18+DM), 2) + pow(sigma * DM_err, 2) ) / pow(91.18+DM, 2);
 
   outTableFile << cat << "-" << energyType << " & " << type << " & "<< Entries << " & "
-	       << DM << " $\\pm$ " << DM_err << " & "
-               << Scb / (91.18+DM) << " & "
-               << sigma / (91.18+DM) <<  " \\\\ " <<std::endl;
+	       << std::setw(4) << DM << " $\\pm$ " << std::setw(4) << DM_err << " & "
+               << std::setw(5) << ScboM << " $\\pm$ " << std::setw(5) << ScboM_err << " & "
+               << std::setw(5) << SoloM << " $\\pm$ " << std::setw(5) << SoloM_err << " \\\\ " <<std::endl;
 
 
   if(debug) std::cout << " END!! Fitting: category " << cat << " energyType = " << energyType << std::endl;
@@ -512,21 +537,34 @@ if(allOthers){
    outTableFile << " \\hline " << std::endl;
    outTableFile << " \\hline " << std::endl;
    
-  outTableFile << " \\end{tabular} " << std::endl;
-  outTableFile << " \\end{center} " << std::endl;
-  outTableFile << " \\end{table} " << std::endl;
+   outTableFile << " \\end{tabular} " << std::endl;
+   outTableFile << " \\end{center} " << std::endl;
+   outTableFile << " \\end{table} " << std::endl;
+
+   outTableFile << " \\end{document} " << std::endl;
  }
 
 
 //vsRun
  if(vsRun){
-   std::string nameTable = outputTable+"_"+type+"_vsRun.txt";
+   std::string nameTable = outputTable+"_"+type+"_vsRun.tex";
    std::ofstream outTableFile (nameTable.c_str(),std::ios::out);  
- 
+
+   outTableFile << " \\documentclass[10pt,a4paper]{article} " << std::endl;
+   outTableFile << " \\usepackage[latin1]{inputenc} " << std::endl;
+   outTableFile << " \\usepackage[left=1.in,right=1.in,top=1in,bottom=1.in]{geometry}" << std::endl;
+   outTableFile << " \\usepackage{amsmath}" << std::endl;
+   outTableFile << " \\usepackage{amsfonts}" << std::endl;
+   outTableFile << " \\usepackage{amssymb}" << std::endl;
+   outTableFile << " \\usepackage{rotating}" << std::endl;
+
+   outTableFile << " \\begin{document}" << std::endl;
+
+
    outTableFile << " \\begin{table}[!htb] " << std::endl;
    outTableFile << " \\begin{center} " << std::endl;
-
-   outTableFile << "\\begin{tabular}{c|c|c|c|c|c}" << std::endl;
+   outTableFile << "\\footnotesize" << std::endl;
+   outTableFile << "\\begin{tabular}{c|c|c|c|c|c|c|c}" << std::endl;
 
    outTableFile << "\\hline" << std::endl;
    outTableFile << "\\hline" << std::endl;
@@ -535,8 +573,8 @@ if(allOthers){
 
    outTableFile << " Category" << " & " << "Run-bin " << " & " << " type " << " & " << " Event " << " & " 
 		<< " $\\Delta M_{" << type << "}$ "  << " & " 
-		<< " $\\sigma_{cb}^{" << type << "}/ (M + \\Delta M_{" << type << "}$ " << " & "
-		<< " $\\sigma_{ol}^{" << type << "}/ (M + \\Delta M_{" << type << "}$ " << " \\\\ " << std::endl;
+		<< " $ \\frac{\\sigma_{cb}^{" << type << "}}{M + \\Delta M_{" << type << "}}$ " << " & "
+		<< " $\\frac{\\sigma_{ol}^{" << type << "}}{M + \\Delta M_{" << type << "}}$ " << " \\\\ " << std::endl;
 
    outTableFile << "\\hline" << std::endl;
    outTableFile << "\\hline" << std::endl;
@@ -560,29 +598,41 @@ if(allOthers){
 
      outTableFile << " & " << " & " << " & " << " & " << " & " << " & " << " \\\\ " << std::endl;
 
-     int Entries = Zmass_regression_runId[cat].at(ii)->GetEntries(); 
+
+     int Entries = Zmass_regression_runId[cat].at(ii)->GetEntries();
      float DM = Zmass_regression_runId[cat].at(ii)->GetFunction(funcName.c_str())->GetParameter(3);
      float DM_err = Zmass_regression_runId[cat].at(ii)->GetFunction(funcName.c_str())->GetParError(3);
+
      float Scb = Zmass_regression_runId[cat].at(ii)->GetFunction(funcName.c_str())->GetParameter(4);
      float Scb_err = Zmass_regression_runId[cat].at(ii)->GetFunction(funcName.c_str())->GetParError(4);
-     float Sol_err = (0.001 *(extreme.second-extreme.first - a*FWHMZ*FWHMZ) / 2. /
-		      (sqrt( 2.*log(2) * ( pow(extreme.second-extreme.first - a*FWHMZ*FWHMZ, 2) - b*FWHMZ*FWHMZ )) ) );
+     float Sol_err = olivieroLongbothan(extreme.first, extreme.second).second;
+
+     float ScboM = Scb/(91.18+DM);
+     float ScboM_err = sqrt( pow(Scb_err * (91.18+DM), 2) + pow(Scb * DM_err, 2) ) / pow(91.18+DM, 2);
+     float SoloM = sigma/(91.18+DM);
+     float SoloM_err = sqrt( pow(Sol_err * (91.18+DM), 2) + pow(sigma * DM_err, 2) ) / pow(91.18+DM, 2);
 
      outTableFile << cat << " " << energyType << " & " << runIdVec.at(ii) << "-" << runIdVec.at(ii+1) << " & " << type << " & " << Entries << " & " 
-	       << DM << " $\\pm$ " << DM_err << " & " 
-	       << Scb / (91.18+DM) << " & " 
-	       << sigma / (91.18+DM) << " \\\\ " <<std::endl;
+		  << std::setw(4) << DM << " $\\pm$ " << std::setw(4) << DM_err << " & "
+		  << std::setw(5) << ScboM << " $\\pm$ " << std::setw(5) << ScboM_err << " & "
+		  << std::setw(5) << SoloM << " $\\pm$ " << std::setw(5) << SoloM_err << " \\\\ " <<std::endl;
 
 
-  Zscale_runId[cat]->SetBinContent(ii+1, DM);
-  Zscale_runId[cat]->SetBinError(ii+1, DM_err);
-  ZScb_runId[cat]->SetBinContent(ii+1, Scb / (91.18+DM));
-  ZScb_runId[cat]->SetBinError(ii+1, sqrt(Scb_err*Scb_err + DM_err*DM_err) / (91.18+DM) );
-  ZSol_runId[cat]->SetBinContent(ii+1, sigma / (91.18+DM));
-  ZSol_runId[cat]->SetBinError(ii+1, sqrt(Sol_err*Sol_err + DM_err*DM_err) / (91.18+DM));
 
+     Zscale_runId[cat]->SetBinContent(ii+1, DM);         Zscale_runId[cat]->SetBinError(ii+1, DM_err);
+     ZScb_runId[cat]->SetBinContent(ii+1, ScboM);        ZScb_runId[cat]->SetBinError(ii+1, ScboM_err);
+     ZSol_runId[cat]->SetBinContent(ii+1, SoloM);        ZSol_runId[cat]->SetBinError(ii+1, SoloM_err);
+     
      }
    }
+
+   outTableFile << " \\hline " << std::endl;
+   outTableFile << " \\hline " << std::endl;
+   
+   outTableFile << " \\end{tabular} " << std::endl;
+   outTableFile << " \\end{center} " << std::endl;
+   outTableFile << " \\end{table} " << std::endl;
+   outTableFile << " \\end{document} " << std::endl;
  }
 
 
@@ -658,6 +708,8 @@ if(allOthers){
 
      TCanvas* cScale = new TCanvas();
      gPad->SetGrid();
+     gPad->SetLeftMargin(0.15);
+     gPad->SetRightMargin(0.15);
      Zscale->GetYaxis()->SetRangeUser(-1., 2.);
      Zscale->GetYaxis()->SetTitle("#Delta M");
      Zscale->Draw();
@@ -667,6 +719,8 @@ if(allOthers){
      
      TCanvas* cScb = new TCanvas();
      gPad->SetGrid();
+     gPad->SetLeftMargin(0.15);
+     gPad->SetRightMargin(0.15);
      ZScb->GetYaxis()->SetRangeUser(0.005, 0.05);
      ZScb->GetYaxis()->SetTitle("#sigma_{cb} / (M + #Delta M)");
      ZScb->Draw();
@@ -676,6 +730,8 @@ if(allOthers){
      
      TCanvas* cSol = new TCanvas();
      gPad->SetGrid();
+     gPad->SetLeftMargin(0.15);
+     gPad->SetRightMargin(0.15);
      ZSol->GetYaxis()->SetRangeUser(0.005, 0.05);
      ZSol->GetYaxis()->SetTitle("#sigma_{ol} / (M + #Delta M)");
      ZSol->Draw();
@@ -713,6 +769,8 @@ if(allOthers){
 
      cScale_runId[ii] = new TCanvas;
      gPad->SetGrid();
+     gPad->SetLeftMargin(0.15);
+     gPad->SetRightMargin(0.15);
      //   ZscaleDATA_EB_runId->GetYaxis()->SetRangeUser(-1., 2.);
      Zscale_runId[cat]->GetYaxis()->SetTitle("#Delta M");
      Zscale_runId[cat]->Draw();
@@ -724,6 +782,8 @@ if(allOthers){
 
      cScb_runId[ii] = new TCanvas;
      gPad->SetGrid();
+     gPad->SetLeftMargin(0.15);
+     gPad->SetRightMargin(0.15);
      //   ZscaleDATA_EB_runId->GetYaxis()->SetRangeUser(-1., 2.);
      ZScb_runId[cat]->GetYaxis()->SetTitle("#sigma_{cb} / (M + #Delta M)");
      ZScb_runId[cat]->Draw();
@@ -735,6 +795,8 @@ if(allOthers){
 
      cSol_runId[ii] = new TCanvas;
      gPad->SetGrid();
+     gPad->SetLeftMargin(0.15);
+     gPad->SetRightMargin(0.15);
      //   ZscaleDATA_EB_runId->GetYaxis()->SetRangeUser(-1., 2.);
      ZSol_runId[cat]->GetYaxis()->SetTitle("#sigma_{ol} / (M + #Delta M)");
      ZSol_runId[cat]->Draw();

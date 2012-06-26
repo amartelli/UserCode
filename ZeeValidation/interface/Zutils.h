@@ -24,6 +24,8 @@
 #endif
 
 
+/*** oliviero-l ***/
+std::pair<double, double> olivieroLongbothan(const double& first, const double& second, const double& precision = 0.001);
 
 /*** breit-wigner ***/
 double breitWigner(double* x, double* par);

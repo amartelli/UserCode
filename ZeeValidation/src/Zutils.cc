@@ -8,8 +8,25 @@
 #include <iostream>
 
 int nPoint;
-double mZ_min, mZ_max ;
-std::string energySC ;
+double mZ_min, mZ_max;
+std::string energySC;
+
+
+
+std::pair<double, double> olivieroLongbothan(const double& first, const double& second, const double& precision){
+  double a = 0.5346;
+  double b = 0.2166;
+  double BW = 2.4952;
+
+  double sigmaOL = sqrt( pow( (second - first) - a * BW, 2) - (b * BW * BW) ) / ( 2. * sqrt(2. * log(2)) ); 
+
+  double errorOL = ( ((second - first) - a * BW) * precision) / sqrt( pow( (second - first) - a * BW, 2) - (b * BW * BW) ) / ( 2. * sqrt(log(2)) );
+
+  std::pair<double, double> OL(sigmaOL, errorOL);
+  return OL;
+}
+
+
 
 /*** breit-wigner ***/
 double breitWigner(double* x, double* par){

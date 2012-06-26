@@ -679,7 +679,7 @@ if(allOthers){
  if(debug) std::cout << "recalibZ::Closed now Printing" << std::endl;
 
    
-  std::string outDir = "summaryPlots_"+type;
+  std::string outDir = "output/summaryPlots_"+type;
   Color_t iStyle = kGreen+2;
 
   if(type == "MC") iStyle = kRed+1;

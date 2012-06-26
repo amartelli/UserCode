@@ -750,7 +750,7 @@ if(category == "EB-EB" || category == "EBp" || category == "EBm" || category=="E
   // ---------------
   // print the plots
 
- c->Print(("summaryPlots_"+type+"/"+h_mZ_Name+".png").c_str(),"png");
+ c->Print(("output/summaryPlots_"+type+"/"+h_mZ_Name+".png").c_str(),"png");
  delete c;
  
 }

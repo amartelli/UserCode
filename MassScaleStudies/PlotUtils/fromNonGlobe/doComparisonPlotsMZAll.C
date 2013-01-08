@@ -8,7 +8,7 @@ void doComparisonPlots(){
 
   //  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
 
-  std::string plotDir = "PLOTS_MZ";
+  std::string plotDir = "../../PLOTS_MZ";
   std::string plotDirOut = "2011vs2012_MZ";
 
 //    std::string plotDir = "PLOTS_MZ_Sh";

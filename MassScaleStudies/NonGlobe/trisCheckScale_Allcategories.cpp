@@ -131,10 +131,6 @@ int main(int argc, char** argv)
   std::cout << "evtsPerPoint: " << evtsPerPoint  << std::endl;
   std::cout << "year:      " << year       << std::endl;
   std::cout << "doVsEach:      " << doVsEach       << std::endl;
-  std::cout << "IetaMin: "      << IetaMin       << std::endl;
-  std::cout << "IetaMax: "      << IetaMax       << std::endl;
-  std::cout << "IphiMin: "      << IphiMin       << std::endl;
-  std::cout << "IphiMax: "      << IphiMax       << std::endl;
   
 
   TPileupReweighting* puReweighting;
@@ -171,7 +167,7 @@ int main(int argc, char** argv)
   //   if(year == 2011) nameNtuples = "ntu";  
   //   if(year == 2011) nameNtuplesMC = "ntu";  
   
-  if(year == 2012) nameNtuplesMC = "simpleNtupleEoverPSh/SimpleNtupleEoverP";
+  //  if(year == 2012) nameNtuplesMC = "simpleNtupleEoverPSh/SimpleNtupleEoverP";
   TChain* ntu_MC = new TChain(nameNtuplesMC.c_str());
   TChain* ntu_DA = new TChain(nameNtuples.c_str());
   
@@ -190,37 +186,56 @@ int main(int argc, char** argv)
     ntu_MC->Add("/tmp/amartell/DYJetsToLL_Fall11_START44_V9B_ok_All_simpleNtuple_mc.root");
     }
   */
-  
-  if(year == 2012){
-    //ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC/DYJetsToLL_Summer12_START50_V15_noLLR/*.root");
-    ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC_53X/DYJets-Summer12-START53-noSkim/*.root");
+
+
+//   if(year == 2012){
+//     //ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC/DYJetsToLL_Summer12_START50_V15_noLLR/*.root");
+//     ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC_53X/DYJets-Summer12-START53-noSkim/*.root");
     
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012A/cron_DoubleElectron_Run2012A-PromptReco-v1_RECO/2012-9-11_12:15/*.root");
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012A/cron_DoubleElectron_Run2012A-PromptReco-v1_RECO/2012-9-11_12:15/*.root");
     
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012B/cron_DoubleElectron_Run2012B-PromptReco-v1_RECO/2012-9-11_13:24/*.root");
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012B/cron_DoubleElectron_Run2012B-PromptReco-v1_RECO/2012-9-11_13:24/*.root");
     
-    // ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/13Jul2012_v2/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO/*.root");                                                                                                                                        
-    // ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/13Jul2012_v2/DoubleElectron_Run2012B-ZElectron-13Jul2012-v1_RAW-RECO/*.root");                                                                                                                                        
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v1_AOD/2012-9-11_11:22/*.root");                                                                                                                                 
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-11_15:17/*.root");                                                                                                                                 
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-17_12:6/*.root");                                                                                                                                  
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-19_6:2/*.root");                                                                                                                                   
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-20_18:2/*.root");                                                                                                                                  
+//     // ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/13Jul2012_v2/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO/*.root");                                                                                                                                        
+//     // ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/13Jul2012_v2/DoubleElectron_Run2012B-ZElectron-13Jul2012-v1_RAW-RECO/*.root");                                                                                                                                        
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v1_AOD/2012-9-11_11:22/*.root");                                                                                                                                 
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-11_15:17/*.root");                                                                                                                                 
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-17_12:6/*.root");                                                                                                                                  
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-19_6:2/*.root");                                                                                                                                   
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-20_18:2/*.root");                                                                                                                                  
     
 
-//     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO.root");
-//     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO.root");
-//     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012B-ZElectron-13Jul2012-v1_RAW-RECO.root");
-//     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012C-PromptReco-v1_AOD.root");
-//     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012C-PromptReco-v2_AOD.root");
-  }
-  //2011   
+// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO.root");
+// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO.root");
+// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012B-ZElectron-13Jul2012-v1_RAW-RECO.root");
+// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012C-PromptReco-v1_AOD.root");
+// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012C-PromptReco-v2_AOD.root");
+//   }
+
+//   //2011   
                                                                                                                                                  
-  if(year == 2011){
-    ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/rereco29Jun_for2011/*.root");
-    ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC/DYJetsToLL_Fall11_START44_V9B_ok/*.root");
+//   if(year == 2011){
+//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/rereco29Jun_for2011/*.root");
+//     ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC/DYJetsToLL_Fall11_START44_V9B_ok/*.root");
+//   }
+
+
+
+  if(year == 2012){
+    ntu_MC->Add("/tmp/amartell/DYToEE_M-20_CT10_TuneZ2star_v2_8TeV-powheg-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM.root");
+    ntu_MC->Add("/tmp/amartell/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM_2.root");
+    ntu_DA->Add("/tmp/amartell/DoubleElectronAB_13Jul2012.root");
+    ntu_DA->Add("/tmp/amartell/DoubleElectron_C_Prompt.root");
+
+//     ntu_MC->Add("/tmp/amartell/WJetsToLNu_START53_V7A.root");
+//     ntu_DA->Add("/tmp/amartell/Single_AB_Prompt.root");
+//     ntu_DA->Add("/tmp/amartell/Single_C_Prompt.root");
   }
 
+  if(year == 2011){                                                                                                                      
+    ntu_DA->Add("/tmp/amartell/DoubleElectron-RUN2011AB.root");          
+    ntu_MC->Add("/tmp/amartell/DYJetsToLL_Fall11_START44_V9B.root");
+  }                                                                                                                                      
 
   std::cout << "     REFERENCE: " << std::setw(8) << ntu_MC->GetEntries() << " entries" << std::endl;
   std::cout << "     DATA: " << std::setw(8) << ntu_DA->GetEntries() << " entries" << std::endl;
@@ -615,11 +630,6 @@ int main(int argc, char** argv)
     if(doVsEach == "true" && strcmp(ENE,"e3x3")==0 && scEt_3x3_DA.at(ientry) <  25.) continue;
     if(doVsEach == "false" && scEt_reg_DA.at(ientry) <  25.) continue;   
 
-    if( (absEtaMin != -1.) && (absEtaMax != -1.) )
-    {
-	if( (fabs(scEta_DA.at(ientry)) < absEtaMin) || (fabs(scEta_DA.at(ientry)) > absEtaMax) ) continue;
-    }
-    
     isSavedEntries.at(ientry) = true;
 
     SorterLC dummy;
@@ -865,11 +875,6 @@ int main(int argc, char** argv)
     if(doVsEach == "true" && strcmp(ENE,"e3x3")==0 && scEt_3x3_MC.at(ientry) <  25.) continue;
     if(doVsEach == "false" && scEt_reg_MC.at(ientry) <  25.) continue;   
 
-    if( (absEtaMin != -1.) && (absEtaMax != -1.) )
-    {
-	if( (fabs(scEta_MC.at(ientry)) < absEtaMin) || (fabs(scEta_MC.at(ientry)) > absEtaMax) ) continue;
-    }
-    
     for(unsigned int bin = 0; bin < EtBinEdge.size(); ++bin)
     {
 

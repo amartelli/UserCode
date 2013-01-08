@@ -6,15 +6,15 @@
 
 void doComparisonPlotsMZAll(){
 
-  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
+  //  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
 
-//     std::string plotDir = "PLOTS_MZAll";
-//     std::string plotDirOut = "2011vs2012_MZAll";
+  std::string plotDir = "../../NonGlobe/PLOTS_MZAll";
+  std::string plotDirOut = "2011vs2012_MZAll";
 //   float xmin = -0.005;
 //   float xmax = 0.015;
 
-     std::string plotDir = "PLOTS_MZAll_Sh";
-     std::string plotDirOut = "2011vs2012_MZAll_Sh";
+//      std::string plotDir = "PLOTS_MZAll_Sh";
+//      std::string plotDirOut = "2011vs2012_MZAll_Sh";
   float xmin = -0.005;
   float xmax = 0.015;
 
@@ -25,10 +25,11 @@ void doComparisonPlotsMZAll(){
 //         std::string plotDirOut = "2011vs2012_MZP_Sh";
      
   for(int ii=0; ii<4; ++ii){
-    if(ii == 0)  std::string category = "EB_HIGH_scE_reg";
-    if(ii == 1)  std::string category = "EB_LOW_scE_reg";
-    if(ii == 2)  std::string category = "notEBEB_HIGH_scE_reg";
-    if(ii == 3)  std::string category = "notEBEB_LOW_scE_reg";
+    std::string category; 
+    if(ii == 0)  category = "EB_HIGH_scE_reg";
+    if(ii == 1)  category = "EB_LOW_scE_reg";
+    if(ii == 2)  category = "notEBEB_HIGH_scE_reg";
+    if(ii == 3)  category = "notEBEB_LOW_scE_reg";
 
     std::string file1112 = plotDir+"/results_"+category+"_1112.root";
 

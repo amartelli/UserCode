@@ -6,18 +6,20 @@
 
 void doComparisonPlotsR9(){
 
-  gROOT->ProcessLine(".x /Users/Arabella/Public/rootLogon.C");
-  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
+//   gROOT->ProcessLine(".x /Users/Arabella/Public/rootLogon.C");
+//   gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
 
-//          std::string plotDir = "PLOTS_R9";
-//          std::string plotDirOut = "2011vs2012_R9";
+  std::string plotDir = "../../NonGlobe/PLOTS_R9";
+  std::string plotDirOut = "2011vs2012_R9";
 
-         std::string plotDir = "PLOTS_R9_Sh";
-         std::string plotDirOut = "2011vs2012_R9_Shcorr";
+//          std::string plotDir = "PLOTS_R9_Sh";
+//          std::string plotDirOut = "2011vs2012_R9_Shcorr";
      
   for(int ii=0; ii<2; ++ii){
-    if(ii == 0)  std::string category = "EB";
-    if(ii == 1)  std::string category = "EE";
+    std::string category;
+
+    if(ii == 0)  category = "EB";
+    if(ii == 1)  category = "EE";
 
     std::string file2011 = plotDir+"/results_"+category+"_scE_reg_2011R9.root";
     std::string file2012 = plotDir+"/results_"+category+"_scE_reg_2012R9.root";

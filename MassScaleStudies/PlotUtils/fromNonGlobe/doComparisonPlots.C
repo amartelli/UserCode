@@ -8,17 +8,22 @@ void doComparisonPlots(){
 
   //  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
 
-//       std::string plotDir = "PLOTS_false";
-//       std::string plotDirOut = "2011vs2012_false";
+  std::string plotDir = "../../NonGlobe/PLOTS_false";
+  std::string plotDirOut = "2011vs2012_false";
 
-      std::string plotDir = "PLOTS_false_Sh";
-      std::string plotDirOut = "2011vs2012_false_Sh";
-     
+  std::cout << " ci sono " << std::endl;
+
+//       std::string plotDir = "PLOTS_false_Sh";
+//       std::string plotDirOut = "2011vs2012_false_Sh";
+
+
+
   for(int ii=0; ii<4; ++ii){
-    if(ii == 0)  std::string category = "EB_HIGH_scE_reg";
-    if(ii == 1)  std::string category = "EB_LOW_scE_reg";
-    if(ii == 2)  std::string category = "EE_HIGH_scE_reg";
-    if(ii == 3)  std::string category = "EE_LOW_scE_reg";
+    std::string category;     
+    if(ii == 0)  category = "EB_HIGH_scE_reg";
+    if(ii == 1)  category = "EB_LOW_scE_reg";
+    if(ii == 2)  category = "EE_HIGH_scE_reg";
+    if(ii == 3)  category = "EE_LOW_scE_reg";
 
     std::string file2011 = plotDir+"/results_"+category+"_2011.root";
     std::string file2012 = plotDir+"/results_"+category+"_2012.root";

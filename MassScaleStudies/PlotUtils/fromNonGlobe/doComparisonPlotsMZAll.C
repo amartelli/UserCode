@@ -4,11 +4,11 @@
 #include <iostream>
 #include <algorithm>
 
-void doComparisonPlots(){
+void doComparisonPlotsMZAll(){
 
   //  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
 
-  std::string plotDir = "../../PLOTS_MZ";
+  std::string plotDir = "../../NonGlobe/PLOTS_MZAll";
   std::string plotDirOut = "2011vs2012_MZ";
 
 //    std::string plotDir = "PLOTS_MZ_Sh";

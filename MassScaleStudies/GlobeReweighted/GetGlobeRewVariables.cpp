@@ -1,7 +1,7 @@
 // g++ -Wall -o GetGlobeRewVariables `root-config --cflags --glibs` GetGlobeRewVariables.cpp
 
 //example
-// ./GetGlobeRewVariables EB HIGH 2012
+// ./GetGlobeRewVariables 2012
 
 #include "TROOT.h"
 #include "TStyle.h"
@@ -52,13 +52,13 @@ int main(int argc, char** argv)
   
   std::cout << "\n*******************************************************************************************************************" << std::endl;
   std::cout << "arcg: " << argc << std::endl;
-  char* EBEE = argv[1];
-  char* LOWHIGH = argv[2];
-  std::string string_year = argv[3];
-  int year = atoi(argv[3]);
+//   char* EBEE = argv[1];
+//   char* LOWHIGH = argv[2];
+  std::string string_year = argv[1];
+  int year = atoi(argv[1]);
 
-  std::cout << "EBEE:         " << EBEE         << std::endl;
-  std::cout << "LOWHIGH:      " << LOWHIGH       << std::endl;
+//   std::cout << "EBEE:         " << EBEE         << std::endl;
+//   std::cout << "LOWHIGH:      " << LOWHIGH       << std::endl;
   std::cout << "year:      " << year       << std::endl;
   
 
@@ -264,7 +264,7 @@ int main(int argc, char** argv)
   	if( (ientry%100000 == 0) ) std::cout << "reading MC entry " << ientry << "\r" << std::flush;
         ntu_MCZee->GetEntry(ientry);  
 
-	if( fabs(scEta1) < 1.4442 || (fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1;
+	if( (fabs(scEta1) < 1.4442 || fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1;
 	  float Rt1 = sin(2*atan(exp(-scEta1)) );
 	  if(scEneReg1*Rt1 > 25.) {
 	    h_Et_allZee_scE_reg->Fill(scEneReg1*Rt1, npu);
@@ -276,7 +276,7 @@ int main(int argc, char** argv)
 	}
 
 	///// second
-	if( fabs(scEta2) < 1.4442 || (fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2
+	if( (fabs(scEta2) < 1.4442 || fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2
 	  float Rt2 = sin(2*atan(exp(-scEta2)) );
 	  if(scEneReg2*Rt2 > 25.)	{
 	    h_Et_allZee_scE_reg->Fill(scEneReg2*Rt2, npu);
@@ -295,7 +295,7 @@ int main(int argc, char** argv)
   	if( (ientry%100000 == 0) ) std::cout << "reading MC entry " << ientry << "\r" << std::flush;
         ntu_MCggh->GetEntry(ientry);  
 
-	if( fabs(scEta1) < 1.4442 || (fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1;
+	if( (fabs(scEta1) < 1.4442 || fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1;
 	  float Rt1 = sin(2*atan(exp(-scEta1)) );
 	  if(scEneReg1*Rt1 > 25.){
 	    h_Et_allggh_scE_reg->Fill(scEneReg1*Rt1, npu);
@@ -307,7 +307,7 @@ int main(int argc, char** argv)
 	}
 
 	///// second
-	if( fabs(scEta2) < 1.4442 || (fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2
+	if( (fabs(scEta2) < 1.4442 || fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2
 	  float Rt2 = sin(2*atan(exp(-scEta2)) );
 	  if(scEneReg2*Rt2 > 25.){
 	    h_Et_allggh_scE_reg->Fill(scEneReg2*Rt2, npu);
@@ -326,7 +326,7 @@ int main(int argc, char** argv)
   	if( (ientry%100000 == 0) ) std::cout << "reading MC entry " << ientry << "\r" << std::flush;
         ntu_MCvbf->GetEntry(ientry);  
 
-	if( fabs(scEta1) < 1.4442 || (fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1
+	if( (fabs(scEta1) < 1.4442 || fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1
 	  float Rt1 = sin(2*atan(exp(-scEta1)) );
 	  if(scEneReg1*Rt1 > 25.)	{
 	    h_Et_allvbf_scE_reg->Fill(scEneReg1*Rt1, npu);
@@ -337,7 +337,7 @@ int main(int argc, char** argv)
 	  }
 	}
 	///// second
-	if( fabs(scEta2) < 1.4442 || (fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2 
+	if( (fabs(scEta2) < 1.4442 || fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2 
 	  float Rt2 = sin(2*atan(exp(-scEta2)) );
 	  if(scEneReg2*Rt2 > 25.)	{
 	    h_Et_allvbf_scE_reg->Fill(scEneReg2*Rt2, npu);
@@ -355,7 +355,7 @@ int main(int argc, char** argv)
   	if( (ientry%100000 == 0) ) std::cout << "reading MC entry " << ientry << "\r" << std::flush;
         ntu_MCwzh->GetEntry(ientry);  
 
-	if( fabs(scEta1) < 1.4442 || (fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1
+	if( (fabs(scEta1) < 1.4442 || fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1
 	  float Rt1 = sin(2*atan(exp(-scEta1)) );
 	  if(scEneReg1*Rt1 > 25.)	{
 	    h_Et_allwzh_scE_reg->Fill(scEneReg1*Rt1, npu);
@@ -366,7 +366,7 @@ int main(int argc, char** argv)
 	  }
 	}
 	///// second
-	if( fabs(scEta2) < 1.4442 || (fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2 
+	if( (fabs(scEta2) < 1.4442 || fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2 
 	  float Rt2 = sin(2*atan(exp(-scEta2)) );
 	  if(scEneReg2*Rt2 > 25.)	{
 	    h_Et_allwzh_scE_reg->Fill(scEneReg2*Rt2, npu);
@@ -384,7 +384,7 @@ int main(int argc, char** argv)
   	if( (ientry%100000 == 0) ) std::cout << "reading MC entry " << ientry << "\r" << std::flush;
         ntu_MCtth->GetEntry(ientry);  
 
-	if( fabs(scEta1) < 1.4442 || (fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1
+	if( (fabs(scEta1) < 1.4442 || fabs(scEta1) > 1.566) && fabs(scEta1) < 2.7) { //no crack1
 	  float Rt1 = sin(2*atan(exp(-scEta1)) );
 	  if(scEneReg1*Rt1 > 25.)	{
 	    h_Et_alltth_scE_reg->Fill(scEneReg1*Rt1, npu);
@@ -395,7 +395,7 @@ int main(int argc, char** argv)
 	  }
 	}
 	///// second
-	if( fabs(scEta2) < 1.4442 || (fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2
+	if( (fabs(scEta2) < 1.4442 || fabs(scEta2) > 1.566) && fabs(scEta2) < 2.7) { //no crack2
 	  float Rt2 = sin(2*atan(exp(-scEta2)) );
 	  if(scEneReg2*Rt2 > 25.)	{
 	    h_Et_alltth_scE_reg->Fill(scEneReg2*Rt2, npu);

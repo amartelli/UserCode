@@ -1,4 +1,4 @@
-// g++ -Wall -o trisCheckScale_All `root-config --cflags --glibs` ../Utils/setTDRStyle.cc ../Utils/ntupleUtils.cc ../Utils/stabilityUtils.cc ../Utils/ConvoluteTemplate.cc ../Utils/histoFunc.h ../Utils/TPileupReweighting.h trisCheckScale_All.cpp
+// g++ -Wall -o trisCheckScale_All `root-config --cflags --glibs` -L/gwteraw/cmssw/slc5_amd64_gcc462/external/gcc/4.6.2/lib64/ ../Utils/setTDRStyle.cc ../Utils/ntupleUtils.cc ../Utils/stabilityUtils.cc ../Utils/ConvoluteTemplate.cc ../Utils/histoFunc.h ../Utils/TPileupReweighting.h trisCheckScale_All.cpp
 
 #include "../Utils/setTDRStyle.h"
 #include "../Utils/histoFunc.h"

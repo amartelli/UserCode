@@ -79,8 +79,8 @@ int main(int argc, char** argv)
 
   bool correctEt = false;
 
-  bool useShCorr = true;
-  //  bool useShCorr = false;
+  //  bool useShCorr = true;
+  bool useShCorr = false;
 
   bool useMomentum = false;
   //bool useMomentum = true;
@@ -200,25 +200,27 @@ int main(int argc, char** argv)
   std::string nameNtuples = "simpleNtupleEoverP/SimpleNtupleEoverP";
   std::string nameNtuplesMC = "simpleNtupleEoverP/SimpleNtupleEoverP";
   //  if(year == 2011) nameNtuples = "ntu";                                     
-  if(year == 2012) nameNtuplesMC = "simpleNtupleEoverPSh/SimpleNtupleEoverP";
+  //  if(year == 2012) nameNtuplesMC = "simpleNtupleEoverPSh/SimpleNtupleEoverP";
 
   ntu_MC = new TChain(nameNtuplesMC.c_str());
   ntu_DA = new TChain(nameNtuples.c_str());
 
-  //2012                                                                                                           
+
+
   if(year == 2012){
-    ntu_MC->Add("/tmp/amartell/DYJets-Summer12-START53-noSkim.root");
-    //    ntu_MC->Add("/tmp/amartell/DYJToLL_M50_TuneZ2S_8TeV-mad_Summer12_DR53X-PU_S10_START53_V7A-v1.root");     
-    //    ntu_MC->Add("/tmp/amartell/DYJetsToLL_Summer12_START50_V15_noLLR_All_simpleNtuple_mc.root");             
-    ntu_DA->Add("/tmp/amartell/DoubleElectron_Run2012AB_All_simpleNtuple.root");
-    ntu_DA->Add("/tmp/amartell/DoubleElectron_Run2012C-PromptReco-v1-2_All_simpleNtuple.root");
+    ntu_MC->Add("/tmp/amartell/DYToEE_M-20_CT10_TuneZ2star_v2_8TeV-powheg-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM.root");
+    ntu_MC->Add("/tmp/amartell/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM_2.root");
+    ntu_DA->Add("/tmp/amartell/DoubleElectronAB_13Jul2012.root");
+    ntu_DA->Add("/tmp/amartell/DoubleElectron_C_Prompt.root");
+
+    //     ntu_MC->Add("/tmp/amartell/WJetsToLNu_START53_V7A.root");                                                                                  
+    //     ntu_DA->Add("/tmp/amartell/Single_AB_Prompt.root");                                                                                        
+    //     ntu_DA->Add("/tmp/amartell/Single_C_Prompt.root");                                                                                         
   }
-  //2011                                                                                          
+
   if(year == 2011){
-    ntu_DA->Add("/tmp/amartell/DoubleElectron-RUN2011_AB.root");
-//     ntu_DA->Add("/tmp/amartell/WZAnalysis_DoubleElectron_Run2011A-16Jan2012-v1_AOD_newBranches.root");
-//     ntu_DA->Add("/tmp/amartell/WZAnalysis_DoubleElectron_Run2011B-16Jan2012-v1_AOD_newBranches.root");
-    ntu_MC->Add("/tmp/amartell/DYJetsToLL_Fall11_START44_V9B_ok_All_simpleNtuple_mc.root");
+    ntu_DA->Add("/tmp/amartell/DoubleElectron-RUN2011AB.root");
+    ntu_MC->Add("/tmp/amartell/DYJetsToLL_Fall11_START44_V9B.root");
   }
 
 

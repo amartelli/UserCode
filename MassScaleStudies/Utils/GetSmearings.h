@@ -11,17 +11,17 @@ float GetSmearings(const float& scEta, const float& r9, const int& year, const i
   //2012 
   if(year == 2012){
     //EB LR9
-    if( isEB == 1 && fabs(scEta) < 1. && r9 < 0.94) smear = 0.0075;
-    if( isEB == 1 && fabs(scEta) > 1. && r9 < 0.94) smear = 0.0075;
+    if( isEB == 1 && fabs(scEta) < 1. && r9 < 0.94) smear = 0.0107;
+    if( isEB == 1 && fabs(scEta) > 1. && r9 < 0.94) smear = 0.0194;
     //EB HR9
-    if( isEB == 1 && fabs(scEta) < 1. && r9 > 0.94) smear = 0.0075;
-    if( isEB == 1 && fabs(scEta) > 1. && r9 > 0.94) smear = 0.0075;
+    if( isEB == 1 && fabs(scEta) < 1. && r9 > 0.94) smear = 0.0111;
+    if( isEB == 1 && fabs(scEta) > 1. && r9 > 0.94) smear = 0.0155;
     //EE LR9
-    if( isEB == 0 && fabs(scEta) < 2. && r9 < 0.94) smear = 0.0075;
-    if( isEB == 0 && fabs(scEta) > 2. && r9 < 0.94) smear = 0.0075;
+    if( isEB == 0 && fabs(scEta) < 2. && r9 < 0.94) smear = 0.0276;
+    if( isEB == 0 && fabs(scEta) > 2. && r9 < 0.94) smear = 0.0371;
     //EE HR9
-    if( isEB == 0 && fabs(scEta) < 2. && r9 > 0.94) smear = 0.0075;
-    if( isEB == 0 && fabs(scEta) > 2. && r9 > 0.94) smear = 0.0075;
+    if( isEB == 0 && fabs(scEta) < 2. && r9 > 0.94) smear = 0.0295;
+    if( isEB == 0 && fabs(scEta) > 2. && r9 > 0.94) smear = 0.0370;
   }
 
   //2011  // from AN2011-426

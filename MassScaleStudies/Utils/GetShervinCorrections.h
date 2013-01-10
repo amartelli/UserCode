@@ -8,6 +8,8 @@ float GetShervingCorrections(const float& scEta, const float& r9, const int& run
 
   float corr = 1.;
 
+  /////////////////////////////////////////////////////////////////
+  //HCP 2012
   //2012 EB
   if( fabs(scEta) < 1. && r9 < 0.94) {
     if(runId >    190645 && runId <  190781) corr = 1.0020;
@@ -159,7 +161,101 @@ float GetShervingCorrections(const float& scEta, const float& r9, const int& run
     if(runId > 201657 && runId <  202305) corr = 0.9999;
     if(runId > 202305 && runId <  203002) corr = 1.0018;
   }
-
+  ///////////////////////////////////////////////////////////////////////////
+  //new for Moriond2013
+  //2012 EB 
+  if(fabs(scEta) < 1. && r9 < 0.94){
+    if(runId > 203003 && runId < 203984) corr =  1.0061;
+    if(runId > 203985 && runId < 205085) corr =  1.0048;
+    if(runId > 205086 && runId < 205310) corr =  1.0059;
+    if(runId > 205311 && runId < 206207) corr =  1.0055;
+    if(runId > 206208 && runId < 206483) corr =  1.0058;
+    if(runId > 206484 && runId < 206597) corr =  1.0060;
+    if(runId > 206598 && runId < 206896) corr =  1.0061;
+    if(runId > 206897 && runId < 207220) corr =  1.0061;
+    if(runId > 207221 && runId < 208686) corr =  1.0061;
+  }
+  if(fabs(scEta) < 1. && r9 > 0.94){
+    if(runId > 203003 && runId < 203984) corr =  1.0006;
+    if(runId > 203985 && runId < 205085) corr =  0.9993;
+    if(runId > 205086 && runId < 205310) corr =  1.0004;
+    if(runId > 205311 && runId < 206207) corr =  1.0000;
+    if(runId > 206208 && runId < 206483) corr =  1.0003;
+    if(runId > 206484 && runId < 206597) corr =  1.0005;
+    if(runId > 206598 && runId < 206896) corr =  1.0006;
+    if(runId > 206897 && runId < 207220) corr =  1.0006;
+    if(runId > 207221 && runId < 208686) corr =  1.0006;
+  }
+  //2012 EB 4
+  if(fabs(scEta) > 1. && fabs(scEta) < 1.4442 && r9 < 0.94){
+    if(runId > 203003 && runId < 203984) corr =  1.0017;
+    if(runId > 203985 && runId < 205085) corr =  1.0040;
+    if(runId > 205086 && runId < 205310) corr =  1.0037;
+    if(runId > 205311 && runId < 206207) corr =  1.0028;
+    if(runId > 206208 && runId < 206483) corr =  1.0032;
+    if(runId > 206484 && runId < 206597) corr =  1.0032;
+    if(runId > 206598 && runId < 206896) corr =  1.0017;
+    if(runId > 206897 && runId < 207220) corr =  1.0021;
+    if(runId > 207221 && runId < 208686) corr =  1.0030;
+  }
+  if(fabs(scEta) > 1. && fabs(scEta) < 1.4442 && r9 > 0.94){
+    if(runId > 203003 && runId < 203984) corr =  0.9880;
+    if(runId > 203985 && runId < 205085) corr =  0.9903;
+    if(runId > 205086 && runId < 205310) corr =  0.9901;
+    if(runId > 205311 && runId < 206207) corr =  0.9891;
+    if(runId > 206208 && runId < 206483) corr =  0.9895;
+    if(runId > 206484 && runId < 206597) corr =  0.9895;
+    if(runId > 206598 && runId < 206896) corr =  0.9881;
+    if(runId > 206897 && runId < 207220) corr =  0.9884;
+    if(runId > 207221 && runId < 208686) corr =  0.9894;
+  }
+  //2012 EE 
+  if(fabs(scEta) > 1.566 && fabs(scEta) < 2. && r9 < 0.94){
+    if(runId >203003 && runId < 203984) corr =  0.9988;
+    if(runId >203985 && runId < 205085) corr =  0.9997;
+    if(runId >205086 && runId < 205310) corr =  1.0055;
+    if(runId >205311 && runId < 206207) corr =  1.0017;
+    if(runId >206208 && runId < 206483) corr =  0.9989;
+    if(runId >206484 && runId < 206597) corr =  1.0036;
+    if(runId >206598 && runId < 206896) corr =  0.9982;
+    if(runId >206897 && runId < 207220) corr =  0.9978;
+    if(runId >207221 && runId < 208686) corr =  1.0020;;
+  }
+  if(fabs(scEta) > 1.566 && fabs(scEta) < 2. && r9 > 0.94){
+    if(runId >203003 && runId < 203984) corr =  0.9919;
+    if(runId >203985 && runId < 205085) corr =  0.9928;
+    if(runId >205086 && runId < 205310) corr =  0.9987;
+    if(runId >205311 && runId < 206207) corr =  0.9948;
+    if(runId >206208 && runId < 206483) corr =  0.9921;
+    if(runId >206484 && runId < 206597) corr =  0.9968;
+    if(runId >206598 && runId < 206896) corr =  0.9913;
+    if(runId >206897 && runId < 207220) corr =  0.9909;
+    if(runId >207221 && runId < 208686) corr =  0.9951;
+  }
+  //2012 EE far
+  if(fabs(scEta) > 2. && fabs(scEta) < 2.5 && r9 < 0.94){
+    if(runId >203003 && runId < 203984) corr =  1.0104;
+    if(runId >203985 && runId < 205085) corr =  1.0099;
+    if(runId >205086 && runId < 205310) corr =  1.0202;
+    if(runId >205311 && runId < 206207) corr =  1.0144;
+    if(runId >206208 && runId < 206483) corr =  1.0167;
+    if(runId >206484 && runId < 206597) corr =  1.0158;
+    if(runId >206598 && runId < 206896) corr =  1.0162;
+    if(runId >206897 && runId < 207220) corr =  1.0165;
+    if(runId >207221 && runId < 208686) corr =  1.0172;
+  }
+  if(fabs(scEta) > 2. && fabs(scEta) < 2.5 && r9 > 0.94){
+    if(runId >203003 && runId < 203984) corr =  0.9992;
+    if(runId >203985 && runId < 205085) corr =  0.9987;
+    if(runId >205086 && runId < 205310) corr =  1.0091;
+    if(runId >205311 && runId < 206207) corr =  1.0032;
+    if(runId >206208 && runId < 206483) corr =  1.0056;
+    if(runId >206484 && runId < 206597) corr =  1.0046;
+    if(runId >206598 && runId < 206896) corr =  1.0050;
+    if(runId >206897 && runId < 207220) corr =  1.0053;
+    if(runId >207221 && runId < 208686) corr =  1.0060;
+  }
+  ///////////////////////////////////////////////////////////////////////////
 
   //2011 EB
   if(fabs(scEta) < 1. && r9 < 0.94 ){

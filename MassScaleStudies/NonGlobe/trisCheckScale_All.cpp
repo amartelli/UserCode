@@ -108,8 +108,8 @@ int main(int argc, char** argv)
   //     bool correctEt = true;
   bool correctEt = false;
   
-  bool useShCorr = false;
-  //    bool useShCorr = true;
+  //  bool useShCorr = false;
+  bool useShCorr = true;
   
   //-----------------
   // Input parameters
@@ -175,38 +175,6 @@ int main(int argc, char** argv)
   TChain* ntu_MC = new TChain(nameNtuplesMC.c_str());
   TChain* ntu_DA = new TChain(nameNtuples.c_str());
   
-
-//   if(year == 2012){
-//     //ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC/DYJetsToLL_Summer12_START50_V15_noLLR/*.root");
-//     ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC_53X/DYJets-Summer12-START53-noSkim/*.root");
-    
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012A/cron_DoubleElectron_Run2012A-PromptReco-v1_RECO/2012-9-11_12:15/*.root");
-    
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012B/cron_DoubleElectron_Run2012B-PromptReco-v1_RECO/2012-9-11_13:24/*.root");
-    
-//     // ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/13Jul2012_v2/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO/*.root");                                                                                                                                        
-//     // ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/13Jul2012_v2/DoubleElectron_Run2012B-ZElectron-13Jul2012-v1_RAW-RECO/*.root");                                                                                                                                        
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v1_AOD/2012-9-11_11:22/*.root");                                                                                                                                 
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-11_15:17/*.root");                                                                                                                                 
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-17_12:6/*.root");                                                                                                                                  
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-19_6:2/*.root");                                                                                                                                   
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/PromptReco/Run2012C/cron_DoubleElectron_Run2012C-PromptReco-v2_AOD/2012-9-20_18:2/*.root");                                                                                                                                  
-    
-
-// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO.root");
-// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012A-ZElectron-13Jul2012-v1_RAW-RECO.root");
-// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012B-ZElectron-13Jul2012-v1_RAW-RECO.root");
-// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012C-PromptReco-v1_AOD.root");
-// //     ntu_DA->Add("/tmp/abenagli/DoubleElectron_Run2012C-PromptReco-v2_AOD.root");
-//   }
-
-//   //2011   
-                                                                                                                                                 
-//   if(year == 2011){
-//     ntu_DA->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/ReReco/rereco29Jun_for2011/*.root");
-//     ntu_MC->Add("root://eoscms//eos/cms/store/group/alca_ecalcalib/ecalMIBI/NTUPLES_EOverP/MC/DYJetsToLL_Fall11_START44_V9B_ok/*.root");
-//   }
-
 
 
   if(year == 2012){
@@ -541,9 +509,6 @@ int main(int argc, char** argv)
   std::cout << std::endl;
   std::cout << "***** Sort events and define bins *****" << std::endl;
   
-//   if(SortV == "R9") { cloneSortVar_DA = R9_DA.size(); cloneSortVar_MC = R9_MC.size(); }
-//   if(SortV == "Et") { cloneSortVar_DA = scEt_reg_DA.size(); cloneSortVar_MC = scEt_reg_MC.size(); }
-
   int nEntries = cloneSortVar_DA.size();
   int nSavePts = 0;
   std::vector<bool> isSavedEntries(nEntries);
@@ -554,15 +519,20 @@ int main(int argc, char** argv)
     isSavedEntries.at(ientry) = false;
 
     // save only what is needed for the analysis!!!
-    if(strcmp(EBEE,"EE")==0 && (fabs(scEta_DA.at(ientry)) < 1.566 || fabs(scEta_DA.at(ientry)) > 2.7 )) continue; // endcap
-    if(strcmp(EBEE,"EB")==0 && (fabs(scEta_DA.at(ientry)) > 1.4442 )) continue; // endcap
+    if(strcmp(EBEE,"EE")==0 && (fabs(scEta_DA.at(ientry)) < 1.566 || fabs(scEta_DA.at(ientry)) > 2.5 )) continue; 
+    if(strcmp(EBEE,"EB")==0 && (fabs(scEta_DA.at(ientry)) > 1.4442 )) continue;
 
-    if(R9_DA.at(ientry) < 0.7) continue;
+    if(std::string(EBEE) == "BC" && (fabs(scEta_DA.at(ientry)) > 1. )) continue;
+    if(std::string(EBEE) == "B4" && (fabs(scEta_DA.at(ientry)) < 1. || fabs(scEta_DA.at(ientry)) > 1.4442)) continue;
+    if(std::string(EBEE) == "EL" && (fabs(scEta_DA.at(ientry)) < 1.566 || fabs(scEta_DA.at(ientry)) > 2. )) continue;
+    if(std::string(EBEE) == "EH" && (fabs(scEta_DA.at(ientry)) > 2.5 )) continue;
+
+    //    if(R9_DA.at(ientry) < 0.7) continue;
     if(scEt_reg_DA.at(ientry) <  25.) continue;
 
     //to be fixed -> categories as in Hgg
-    if(SortV == "Et" && strcmp(LOWHIGH,"LOW")==0 && (R9_DA.at(ientry) >= 0.94 || R9_DA.at(ientry) < 0.7) ) continue;
-    if(SortV == "Et" && strcmp(LOWHIGH,"HIGH")==0 && R9_DA.at(ientry) < 0.94 ) continue;
+    if(std::string(LOWHIGH) == "LOW" && R9_DA.at(ientry) >= 0.94) continue;
+    if(std::string(LOWHIGH) == "HIGH" && R9_DA.at(ientry) < 0.94 ) continue;
 
     isSavedEntries.at(ientry) = true;
 
@@ -618,10 +588,6 @@ int main(int argc, char** argv)
   
   TH1F** h_EoP_DA = new TH1F*[nBins];
   TH1F** h_EoP_MC = new TH1F*[nBins];
-//   TH1F** h_Et = new TH1F*[nBins];
-//   TH1F** h_Et_MC = new TH1F*[nBins];
-//   TH1F** h_R9 = new TH1F*[nBins];
-//   TH1F** h_R9_MC = new TH1F*[nBins];
   TH1F** h_SortV = new TH1F*[nBins];
   TH1F** h_SortV_MC = new TH1F*[nBins];
 
@@ -668,7 +634,6 @@ int main(int argc, char** argv)
   std::vector<float> EtBinEdge;
   EtBinEdge.clear();
   std::vector<float> xNorm_single;
-  //  float xNorm_all;
 
 
   for(int i = 0; i < nBins; ++i)
@@ -693,12 +658,12 @@ int main(int argc, char** argv)
       h_EoP_MC[i] -> SetLineColor(kGreen+2);
       
       sprintf(histoName, (SortV+"_%d").c_str(), i);
-      if(SortV == "Et") h_SortV[i] = new TH1F(histoName, histoName, 5000, 0, 1.1);
+      if(SortV == "Et") h_SortV[i] = new TH1F(histoName, histoName, 5000, 0., 1000.);
       if(SortV == "R9") h_SortV[i] = new TH1F(histoName, histoName, 2200, 0, 1.1);
       h_SortV[i]->SetLineColor(kRed+2);
 
       sprintf(histoName, (SortV+"_MC_%d").c_str(), i);
-      if(SortV == "Et") h_SortV_MC[i] = new TH1F(histoName, histoName, 5000, 0, 1.1);
+      if(SortV == "Et") h_SortV_MC[i] = new TH1F(histoName, histoName, 5000, 0., 1000.);
       if(SortV == "R9") h_SortV_MC[i] = new TH1F(histoName, histoName, 2200, 0, 1.1);
       h_SortV_MC[i]->SetLineColor(kGreen+2);
       
@@ -774,16 +739,20 @@ int main(int argc, char** argv)
     {    
       if( (ientry%100000 == 0) ) std::cout << "reading entry " << ientry << std::endl;
       
-      if (strcmp(EBEE,"EE")==0 && (fabs(scEta_MC.at(ientry)) < 1.566 || fabs(scEta_MC.at(ientry)) > 2.7 )) continue; // endcap
-      if (strcmp(EBEE,"EB")==0 && (fabs(scEta_MC.at(ientry)) > 1.4442 )) continue; // endcap
+      if (strcmp(EBEE,"EE")==0 && (fabs(scEta_MC.at(ientry)) < 1.566 || fabs(scEta_MC.at(ientry)) > 2.5 )) continue; 
+      if (strcmp(EBEE,"EB")==0 && (fabs(scEta_MC.at(ientry)) > 1.4442 )) continue;
       
-      if(R9_MC.at(ientry) < 0.7) continue;
+      //      if(R9_MC.at(ientry) < 0.7) continue;
       if(scEt_reg_MC.at(ientry) < 25.) continue;
 
-      //to be fixed -> categories as in Hgg                                                                             
-      if(SortV == "Et" && strcmp(LOWHIGH,"LOW")==0 && (R9_MC.at(ientry) >= 0.94 || R9_MC.at(ientry) < 0.7) ) continue;
-      if(SortV == "Et" && strcmp(LOWHIGH,"HIGH")==0 && R9_MC.at(ientry) < 0.94 ) continue;
-
+      //to be fixed -> categories as in Hgg 
+      if(std::string(EBEE) == "BC" && (fabs(scEta_MC.at(ientry)) > 1. )) continue; 
+      if(std::string(EBEE) == "B4" && (fabs(scEta_MC.at(ientry)) < 1. || fabs(scEta_MC.at(ientry)) > 1.4442)) continue; 
+      if(std::string(EBEE) == "EL" && (fabs(scEta_MC.at(ientry)) < 1.566 || fabs(scEta_MC.at(ientry)) > 2. )) continue; 
+      if(std::string(EBEE) == "EH" && (fabs(scEta_MC.at(ientry)) > 2.5 )) continue; 
+                                                                                                     
+      if(std::string(LOWHIGH) == "LOW" && R9_MC.at(ientry) >= 0.94 ) continue;
+      if(std::string(LOWHIGH) == "HIGH" && R9_MC.at(ientry) < 0.94 ) continue;
 
       for(unsigned int bin = 0; bin < EtBinEdge.size(); ++bin){
 	if( (bin != EtBinEdge.size()-1 && cloneSortVar_MC.at(ientry) > EtBinEdge.at(bin) && cloneSortVar_MC.at(ientry) < EtBinEdge.at(bin+1)) ||

@@ -131,8 +131,6 @@ int main(int argc, char** argv)
 
   std::string nameNtuples = "simpleNtupleEoverP/SimpleNtupleEoverP";
   std::string nameNtuplesMC = "simpleNtupleEoverP/SimpleNtupleEoverP";
-  //  if(year == 2011) nameNtuples = "ntu";
-  if(year == 2012) nameNtuplesMC = "simpleNtupleEoverPSh/SimpleNtupleEoverP";
   TChain* ntu_MC = new TChain(nameNtuplesMC.c_str());
   TChain* ntu_DA = new TChain(nameNtuples.c_str());
 

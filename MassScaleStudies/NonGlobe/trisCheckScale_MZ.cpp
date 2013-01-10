@@ -106,13 +106,11 @@ int main(int argc, char** argv)
   TPileupReweighting* puReweighting;
   //2012 prompt           
   if(year == 2012) puReweighting =
- new TPileupReweighting("/afs/cern.ch/work/a/amartell/public/weights/PUweights_DYJetsToLL_Summer12_53X_ShSkim_ABC_TrueNumInteractions.root","hweights");
-    //    new TPileupReweighting("/afs/cern.ch/work/a/amartell/public/weights/PUweights_DYJetsToLL_Summer12_ABC_TrueNumInteractions.root","pileup");
-  //     new TPileupReweighting("/afs/cern.ch/work/a/amartell/public/weights/PUweights_DYJetsToLL_Summer12_Prompt_TrueNumInteractions.root","hweights");
+ new TPileupReweighting("../Pileup/pileup_69p3mb_true_Moriond2013__Summer12_DR53X-PU_S10_START53.root","hweights");
 
   //2011                                                                                                                                              
   if(year == 2011) puReweighting =
-    new TPileupReweighting("/afs/cern.ch/work/a/amartell/public/weights/PUweights_2011_DYJetsToLL_Fall2011_TrueNumInteractions.root", "hweights");
+    new TPileupReweighting("../Pileup/PUweights_2011_DYJetsToLL_Fall2011_TrueNumInteractions.root", "hweights");
 
   
   std::string R9MOD = std::string(LOWHIGH);

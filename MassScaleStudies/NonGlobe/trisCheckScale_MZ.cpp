@@ -134,16 +134,11 @@ int main(int argc, char** argv)
 
   if(year == 2012){
     ntu_MC->Add("/tmp/amartell/DYToEE_M-20_CT10_TuneZ2star_v2_8TeV-powheg-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM.root");
-    ntu_MC->Add("/tmp/amartell/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM_2.root");
-    ntu_DA->Add("/tmp/amartell/DoubleElectronAB_13Jul2012.root");
-    ntu_DA->Add("/tmp/amartell/DoubleElectron_C_Prompt.root");
-    //     ntu_MC->Add("/tmp/amartell/WJetsToLNu_START53_V7A.root");                                                                       
-    //     ntu_DA->Add("/tmp/amartell/Single_AB_Prompt.root");                                                                             
-    //     ntu_DA->Add("/tmp/amartell/Single_C_Prompt.root");                                                                              
+    ntu_DA->Add("/tmp/amartell/Moriond2013/*root");
   }
   if(year == 2011){
     ntu_DA->Add("/tmp/amartell/DoubleElectron-RUN2011AB.root");
-    ntu_MC->Add("/tmp/amartell/DYJetsToLL_Fall11_START44_V9B.root");
+    ntu_MC->Add("/tmp/amartell/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Fall11-PU_S6_START44_V9B-v1_AODSIM_ok.root");
   }
 
   std::cout << "     REFERENCE: " << std::setw(8) << ntu_MC->GetEntries() << " entries" << std::endl;

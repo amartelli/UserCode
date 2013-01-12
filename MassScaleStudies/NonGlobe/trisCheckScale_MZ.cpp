@@ -70,15 +70,17 @@ int main(int argc, char** argv)
   bool UsePhotonRegression = true;
 
 
-  //bool useShCorr = true;  
-  bool useShCorr = false;
+  bool useShCorr = true;  
+  //  bool useShCorr = false;
 
+  bool useMCSmearing = true;  
+  //  bool useMCSmearing = false;
 
   //    bool correctEt = false; 
   bool correctEt = false;
 
-  //  bool useMomentum = false;
-  bool useMomentum = true;
+  bool useMomentum = false;
+  //bool useMomentum = true;
 
   //-----------------
   // Input parameters
@@ -106,12 +108,19 @@ int main(int argc, char** argv)
   TPileupReweighting* puReweighting;
   //2012 prompt           
   if(year == 2012) puReweighting =
- new TPileupReweighting("../Pileup/pileup_69p3mb_true_Moriond2013__Summer12_DR53X-PU_S10_START53.root","hweights");
+ new TPileupReweighting("../Pileup/pileup_69p3mb_true_Moriond2013__Summer12_DR53X-PU_S10_START53.root","h_PUweights");
 
   //2011                                                                                                                                              
   if(year == 2011) puReweighting =
     new TPileupReweighting("../Pileup/PUweights_2011_DYJetsToLL_Fall2011_TrueNumInteractions.root", "hweights");
 
+  TPileupReweighting* HTReweighting;
+  //2012 prompt           
+  std::string HTfileName = "../HT/"+std::string(EBEE)+"_"+std::string(LOWHIGH)+"_2012.root";
+  if(year == 2012) HTReweighting =
+    new TPileupReweighting(HTfileName.c_str(),"h_HTweights");
+
+  TH1F* HTrew_new = new TH1F("HTrew_new", "", 1000, 0., 1000.);
   
   std::string R9MOD = std::string(LOWHIGH);
   std::string ENERGY = std::string(ENE);
@@ -333,9 +342,10 @@ int main(int argc, char** argv)
 
 	float energySmearing1 = 1.;
 	float energySmearing2 = 1.;
+	if(useMCSmearing){
 	energySmearing1 = gRandom->Gaus(1., GetSmearings(scEta1, R9_ele1, year, isEB1));
 	energySmearing2 = gRandom->Gaus(1., GetSmearings(scEta2, R9_ele2, year, isEB2));
-
+	}
 	if(useMomentum){
 	  energySmearing1 = 1.; energySmearing2 = 1.;	}
 
@@ -344,7 +354,10 @@ int main(int argc, char** argv)
 
 
 	ww = puReweighting->GetWeight((int)npu);
-        puRe.push_back(ww);
+	Ht_MC.push_back(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2);
+	ww = ww * HTReweighting->GetWeight(HTrew_new->FindBin(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2));
+        puRe.push_back(ww);	
+
         run_MC.push_back(runId);
         time_MC.push_back(timeStamp);
         Z_MC.push_back(isZ);
@@ -355,8 +368,6 @@ int main(int argc, char** argv)
 	P1_MC.push_back(P1);
 	P2_MC.push_back(P2);
 
-	Ht_MC.push_back(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2);
-	
 	scEta1_MC.push_back(scEta1);
 	scEta2_MC.push_back(scEta2);
 
@@ -663,8 +674,9 @@ int main(int argc, char** argv)
 
     h_EoP_DA[i]->Rebin(2);
     h_EoP_MC[i]->Rebin(2);
-    
-    h_EoP_MC[i]->Smooth(6);
+     
+//     h_EoP_MC[i]->Smooth(2);
+//     h_EoP_DA[i]->Smooth(2);
 
     float xNorm = h_EoP_DA[i]->Integral()/h_EoP_MC[i]->Integral()*h_EoP_DA[i]->GetBinWidth(1)/h_EoP_MC[i]->GetBinWidth(1);  
     float xNormEt = h_Ht[i]->Integral()/h_Ht_MC[i]->Integral(); //*h_Ht[i]->GetBinWidth()/h_Ht_MC[i]->GetBinWidth();  
@@ -709,8 +721,8 @@ int main(int argc, char** argv)
     char funcName[50];
     sprintf(funcName,"f_EoP_%d",i);
     //    f_EoP[i] = new TF1(funcName, templateHistoFunc, x_min, x_max, 3, "histoFunc");
-    f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.7, 1.3, 3, "histoFunc");
-    if(std::string(EBEE) != "EBEB")    f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.7, 1.2, 3, "histoFunc");
+    f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.9, 1.1, 3, "histoFunc");
+    //    if(std::string(EBEE) != "EBEB")    f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.6, 1.2, 3, "histoFunc");
 
 //     histoFunc* templateHistoFunc = new histoFunc(h_EoP_MC[i]);
 //     char funcName[50];

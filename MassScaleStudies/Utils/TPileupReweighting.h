@@ -9,7 +9,7 @@
 
 class TPileupReweighting {
  private:
-  float w[100];
+  float w[1000];
  public:
   TPileupReweighting(std::string,std::string); 
   ~TPileupReweighting();

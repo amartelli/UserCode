@@ -8,7 +8,7 @@ void doComparisonPlotsMZAll(){
 
   //  gROOT->ProcessLine(".x /Users/Arabella/Public/style.C");
 
-  std::string plotDir = "../../NonGlobe/PLOTS_MZAll";
+  std::string plotDir = "../../NonGlobe/PLOTS_MZ";
   std::string plotDirOut = "2011vs2012_MZ";
 
 //    std::string plotDir = "PLOTS_MZ_Sh";
@@ -19,10 +19,10 @@ void doComparisonPlotsMZAll(){
      
   for(int ii=0; ii<4; ++ii){
     std::string category;
-    if(ii == 0)  category = "EB_HIGH_scE_reg";
-    if(ii == 1)  category = "EB_LOW_scE_reg";
-    if(ii == 2)  category = "notEBEB_HIGH_scE_reg";
-    if(ii == 3)  category = "notEBEB_LOW_scE_reg";
+    if(ii == 0)  category = "EBEB_HH_scE_reg";
+    if(ii == 1)  category = "EBEB_notHH_scE_reg";
+    if(ii == 2)  category = "notEBEB_HH_scE_reg";
+    if(ii == 3)  category = "notEBEB_notHH_scE_reg";
 
     std::string file2011 = plotDir+"/results_"+category+"_2011.root";
     std::string file2012 = plotDir+"/results_"+category+"_2012.root";
@@ -51,9 +51,18 @@ void doComparisonPlotsMZAll(){
      graph2011->SetMarkerStyle(21);
    }
 
-  TCanvas* cplot = new TCanvas("gplot", "gplot",100,100,725,500);
-  cplot->cd();
-  TPad *cLeft  = new TPad("pad_0","pad_0",0.00,0.00,1.00,1.00);
+   TCanvas* cplot;
+   if(ii == 0) cplot = new TCanvas("gplot_EBEB_HH", "gplot",100,100,725,500);
+   if(ii == 1) cplot = new TCanvas("gplot_EBEB_notHH", "gplot",100,100,725,500);
+   if(ii == 2) cplot = new TCanvas("gplot_notEBEB_HH", "gplot",100,100,725,500);
+   if(ii == 3) cplot = new TCanvas("gplot_notEBEB_notHH", "gplot",100,100,725,500);
+   cplot->cd();
+   TPad *cLeft;
+   if(ii == 0) cLeft = new TPad("pad_0_EBEB_HH","pad_0",0.00,0.00,1.00,1.00);
+   if(ii == 1) cLeft = new TPad("pad_0_EBEB_notHH","pad_0",0.00,0.00,1.00,1.00);
+   if(ii == 2) cLeft = new TPad("pad_0_notEBEB_HH","pad_0",0.00,0.00,1.00,1.00);
+   if(ii == 3) cLeft = new TPad("pad_0_notEBEB_notHH","pad_0",0.00,0.00,1.00,1.00);
+
   cLeft->SetLeftMargin(0.17);
   cLeft->SetRightMargin(0.025);
   cLeft->SetBottomMargin(0.17);
@@ -80,20 +89,20 @@ void doComparisonPlotsMZAll(){
   tspec->SetFillColor(0);
   tspec->SetTextFont(42);
   if(ii == 0){
-  tspec->AddEntry(graph2012,"2012 EB hR9","PL");
-  tspec->AddEntry(graph2011,"2011 EB hR9","PL");
+  tspec->AddEntry(graph2012,"2012 EBEB HH","PL");
+  tspec->AddEntry(graph2011,"2011 EBEB HH","PL");
   }
   if(ii == 1){
-  tspec->AddEntry(graph2012,"2012 EB lR9","PL");
-  tspec->AddEntry(graph2011,"2011 EB lR9","PL");
+  tspec->AddEntry(graph2012,"2012 EBEB !HH","PL");
+  tspec->AddEntry(graph2011,"2011 EBEB !HH","PL");
   }
   if(ii == 2){
-  tspec->AddEntry(graph2012,"2012 !EBEB hR9","PL");
-  tspec->AddEntry(graph2011,"2011 !EBEB hR9","PL");
+  tspec->AddEntry(graph2012,"2012 !EBEB HH","PL");
+  tspec->AddEntry(graph2011,"2011 !EBEB HH","PL");
   }
   if(ii == 3){
-  tspec->AddEntry(graph2012,"2012 !EBEB lR9","PL");
-  tspec->AddEntry(graph2011,"2011 !EBEB lR9","PL");
+  tspec->AddEntry(graph2012,"2012 !EBEB !HH","PL");
+  tspec->AddEntry(graph2011,"2011 !EBEB !HH","PL");
   }
 
   graph2012->Draw("P");
@@ -101,16 +110,13 @@ void doComparisonPlotsMZAll(){
 
   tspec->Draw("same");
   cplot->Print( (plotDirOut+"/EoP_vs_Et_"+category+".png").c_str(),".png");
-
-  //  cplot->Print( (plotDirOut+"/"+histoName+".png").c_str(),".png");
-
   }
 
   // tutto EB in 1 plot
-  std::string f11_h = plotDir+"/results_EB_HIGH_scE_reg_2011.root";
-  std::string f12_h = plotDir+"/results_EB_HIGH_scE_reg_2012.root";
-  std::string f11_l = plotDir+"/results_EB_LOW_scE_reg_2011.root";
-  std::string f12_l = plotDir+"/results_EB_LOW_scE_reg_2012.root";
+  std::string f11_h = plotDir+"/results_EBEB_HH_scE_reg_2011.root";
+  std::string f12_h = plotDir+"/results_EBEB_HH_scE_reg_2012.root";
+  std::string f11_l = plotDir+"/results_EBEB_notHH_scE_reg_2011.root";
+  std::string f12_l = plotDir+"/results_EBEB_notHH_scE_reg_2012.root";
 
   TFile F12_h(f12_h.c_str(),"read");
   TFile F11_h(f11_h.c_str(),"read");
@@ -165,10 +171,10 @@ void doComparisonPlotsMZAll(){
   tspec->SetFillColor(0);
   tspec->SetTextFont(42);
 
-  tspec->AddEntry(g2012_h,"2012 EB hR9","PL");
-  tspec->AddEntry(g2011_h,"2011 EB hR9","PL");
-  tspec->AddEntry(g2012_l,"2012 EB lR9","PL");
-  tspec->AddEntry(g2011_l,"2011 EB lR9","PL");
+  tspec->AddEntry(g2012_h,"2012 EBEB HH","PL");
+  tspec->AddEntry(g2011_h,"2011 EBEB HH","PL");
+  tspec->AddEntry(g2012_l,"2012 EBEB !HH","PL");
+  tspec->AddEntry(g2011_l,"2011 EBEB !HH","PL");
 
   g2012_h->Draw("p");
   g2011_h->Draw("p, same");
@@ -180,10 +186,10 @@ void doComparisonPlotsMZAll(){
 
   ///////////////////////////////////////////////////////
   // tutto EE in 1 plot
-  std::string f11_hE = plotDir+"/results_notEBEB_HIGH_scE_reg_2011.root";
-  std::string f12_hE = plotDir+"/results_notEBEB_HIGH_scE_reg_2012.root";
-  std::string f11_lE = plotDir+"/results_notEBEB_LOW_scE_reg_2011.root";
-  std::string f12_lE = plotDir+"/results_notEBEB_LOW_scE_reg_2012.root";
+  std::string f11_hE = plotDir+"/results_notEBEB_HH_scE_reg_2011.root";
+  std::string f12_hE = plotDir+"/results_notEBEB_HH_scE_reg_2012.root";
+  std::string f11_lE = plotDir+"/results_notEBEB_notHH_scE_reg_2011.root";
+  std::string f12_lE = plotDir+"/results_notEBEB_notHH_scE_reg_2012.root";
 
   TFile F12_hE(f12_hE.c_str(),"read");
   TFile F11_hE(f11_hE.c_str(),"read");
@@ -237,10 +243,10 @@ void doComparisonPlotsMZAll(){
   tspecE->SetFillColor(0);
   tspecE->SetTextFont(42);
 
-  tspecE->AddEntry(g2012_hE,"2012 !EBEB hR9","PL");
-  tspecE->AddEntry(g2011_hE,"2011 !EBEB hR9","PL");
-  tspecE->AddEntry(g2012_lE,"2012 !EBEB lR9","PL");
-  tspecE->AddEntry(g2011_lE,"2011 !EBEBE lR9","PL");
+  tspecE->AddEntry(g2012_hE,"2012 !EBEB HH","PL");
+  tspecE->AddEntry(g2011_hE,"2011 !EBEB HH","PL");
+  tspecE->AddEntry(g2012_lE,"2012 !EBEB !HH","PL");
+  tspecE->AddEntry(g2011_lE,"2011 !EBEBE !HH","PL");
 
   g2012_hE->Draw("p");
   g2011_hE->Draw("p, same");

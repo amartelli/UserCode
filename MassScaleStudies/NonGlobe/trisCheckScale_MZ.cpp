@@ -114,13 +114,13 @@ int main(int argc, char** argv)
   if(year == 2011) puReweighting =
     new TPileupReweighting("../Pileup/PUweights_2011_DYJetsToLL_Fall2011_TrueNumInteractions.root", "hweights");
 
-  TPileupReweighting* HTReweighting;
-  //2012 prompt           
-  std::string HTfileName = "../HT/"+std::string(EBEE)+"_"+std::string(LOWHIGH)+"_2012.root";
-  if(year == 2012) HTReweighting =
-    new TPileupReweighting(HTfileName.c_str(),"h_HTweights");
 
-  TH1F* HTrew_new = new TH1F("HTrew_new", "", 1000, 0., 1000.);
+  //  std::string HTfileName = "../HT/"+std::string(EBEE)+"_"+std::string(LOWHIGH)+"_"+string_year+".root";
+  std::string HTfileName = "../HT/EBEB_HH_"+string_year+".root";
+  TPileupReweighting* HTReweighting = new TPileupReweighting(HTfileName.c_str(),"h_HTweights");
+  TFile dummyFile (HTfileName.c_str(), "read");
+  TH1F* HTrew_new = (TH1F*)(dummyFile.Get("h_HTweights"))->Clone("HTrew_new");
+  HTrew_new->Reset();
   
   std::string R9MOD = std::string(LOWHIGH);
   std::string ENERGY = std::string(ENE);
@@ -355,7 +355,7 @@ int main(int argc, char** argv)
 
 	ww = puReweighting->GetWeight((int)npu);
 	Ht_MC.push_back(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2);
-	ww = ww * HTReweighting->GetWeight(HTrew_new->FindBin(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2));
+	//	ww = ww * HTReweighting->GetWeight(HTrew_new->FindBin(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2));
         puRe.push_back(ww);	
 
         run_MC.push_back(runId);
@@ -416,7 +416,9 @@ int main(int argc, char** argv)
       if(fabs(scEta2_DA.at(ientry)) < 1.4442) etaDistribEB->Fill(scEta1_DA.at(ientry));
     }
 
-    if( fabs(scEta1_DA.at(ientry)) > 2.5 ||fabs(scEta2_DA.at(ientry)) > 2.5) continue; 
+    if(fabs(scEta1_DA.at(ientry)) > 2.5 ||fabs(scEta2_DA.at(ientry)) > 2.5) continue; 
+    if(fabs(scEta1_DA.at(ientry)) > 1.4442  && fabs(scEta1_DA.at(ientry)) < 1.566) continue;
+    if(fabs(scEta2_DA.at(ientry)) > 1.4442  && fabs(scEta2_DA.at(ientry)) < 1.566) continue;
 
     if(std::string(EBEE) == "EBEB" && (fabs(scEta1_DA.at(ientry)) > 1.4442 )) continue; 
     if(std::string(EBEE) == "EBEB" && (fabs(scEta2_DA.at(ientry)) > 1.4442 )) continue; 
@@ -547,11 +549,11 @@ int main(int argc, char** argv)
     h_EoP_MC[i] -> SetMarkerColor(kGreen+2);
     h_EoP_MC[i] -> SetLineColor(kGreen+2);
     
-    sprintf(histoName, "Et_%d", i);
+    sprintf(histoName, "Ht_%d", i);
     h_Ht[i] = new TH1F(histoName, histoName, 5000, 0, 1000);
     h_Ht[i]->SetLineColor(kRed+2);
 
-    sprintf(histoName, "Et_MC_%d", i);
+    sprintf(histoName, "Ht_MC_%d", i);
     h_Ht_MC[i] = new TH1F(histoName, histoName, 5000, 0, 1000);
     h_Ht_MC[i]->SetLineColor(kGreen+2);
 
@@ -630,7 +632,9 @@ int main(int argc, char** argv)
     {   
       if( (ientry%100000 == 0) ) std::cout << "reading entry " << ientry << std::endl;
 
-      if( fabs(scEta1_MC.at(ientry)) > 2.5 ||fabs(scEta2_MC.at(ientry)) > 2.5) continue;
+      if(fabs(scEta1_MC.at(ientry)) > 2.5 ||fabs(scEta2_MC.at(ientry)) > 2.5) continue;
+      if(fabs(scEta1_MC.at(ientry)) > 1.4442  && fabs(scEta1_MC.at(ientry)) < 1.566) continue;
+      if(fabs(scEta2_MC.at(ientry)) > 1.4442  && fabs(scEta2_MC.at(ientry)) < 1.566) continue;
 
       if(std::string(EBEE) == "EBEB" && (fabs(scEta1_MC.at(ientry)) > 1.4442 )) continue;
       if(std::string(EBEE) == "EBEB" && (fabs(scEta2_MC.at(ientry)) > 1.4442 )) continue;

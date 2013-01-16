@@ -65,10 +65,8 @@ int main(int argc, char** argv)
   Et_lowR9_2012->SetParameters(1.97205016874162468e-02, 4.41133183909690751e-02, -1.58915655671104904e-02);
 
 
-
   //   bool UsePhotonRegression = false;
   bool UsePhotonRegression = true;
-
 
   bool useShCorr = true;  
   //  bool useShCorr = false;
@@ -115,8 +113,8 @@ int main(int argc, char** argv)
     new TPileupReweighting("../Pileup/PUweights_2011_DYJetsToLL_Fall2011_TrueNumInteractions.root", "hweights");
 
 
-  //  std::string HTfileName = "../HT/"+std::string(EBEE)+"_"+std::string(LOWHIGH)+"_"+string_year+".root";
-  std::string HTfileName = "../HT/EBEB_HH_"+string_year+".root";
+  std::string HTfileName = "../HT/"+std::string(EBEE)+"_"+std::string(LOWHIGH)+"_"+string_year+".root";
+  //  std::string HTfileName = "../HT/EBEB_HH_"+string_year+".root";
   TPileupReweighting* HTReweighting = new TPileupReweighting(HTfileName.c_str(),"h_HTweights");
   TFile dummyFile (HTfileName.c_str(), "read");
   TH1F* HTrew_new = (TH1F*)(dummyFile.Get("h_HTweights"))->Clone("HTrew_new");
@@ -269,9 +267,6 @@ int main(int argc, char** argv)
 	  scEneReg1 = P1; scEneReg2 = P2;
 	}
 
-	if(scEneReg1/scEne1*scEt1 < 25. || scEneReg2/scEne2*scEt2 < 25.) continue;
-
-
 	float corrEtR9_1 = 1.;
 	float corrEtR9_2 = 1.;
 	if(correctEt == true){
@@ -296,6 +291,12 @@ int main(int argc, char** argv)
 	}
 
         run_DA.push_back(runId);
+
+	if(scEneReg1/scEne1*scEt1*corrEtR9_1 < 30. || scEneReg2/scEne2*scEt2*corrEtR9_2 < 30.) continue;
+	if(scEneReg1/scEne1*scEt1*corrEtR9_1 > 200. || scEneReg2/scEne2*scEt2*corrEtR9_2 > 200.) continue;
+
+ 	if( (ele1ele2_scM * sqrt(scEneReg1/scEne1 * corrEtR9_1 * scEneReg2/scEne2 * corrEtR9_2)) < 80 || 
+ 	    (ele1ele2_scM * sqrt(scEneReg1/scEne1 * corrEtR9_1 * scEneReg2/scEne2 * corrEtR9_2)) > 100 ) continue;
 
 	Mass_DA.push_back(ele1ele2_scM * sqrt(scEneReg1/scEne1 * corrEtR9_1 * scEneReg2/scEne2 * corrEtR9_2));
 
@@ -350,8 +351,11 @@ int main(int argc, char** argv)
 	  energySmearing1 = 1.; energySmearing2 = 1.;	}
 
 
-	if(scEneReg1/scEne1*scEt1*energySmearing1 < 25. || scEneReg2/scEne2*scEt2*energySmearing2 < 25.) continue;
+	if(scEneReg1/scEne1*scEt1*energySmearing1 < 30. || scEneReg2/scEne2*scEt2*energySmearing2 < 30.) continue;
+	if(scEneReg1/scEne1*scEt1*energySmearing1 > 200. || scEneReg2/scEne2*scEt2*energySmearing2 > 200.) continue;
 
+	if( (ele1ele2_scM * sqrt(scEneReg1/scEne1*energySmearing1 * scEneReg2/scEne2*energySmearing2)) < 80 ||
+	    (ele1ele2_scM * sqrt(scEneReg1/scEne1*energySmearing1 * scEneReg2/scEne2*energySmearing2)) > 100) continue;
 
 	ww = puReweighting->GetWeight((int)npu);
 	Ht_MC.push_back(scEneReg1/scEne1*scEt1*energySmearing1 + scEneReg2/scEne2*scEt2*energySmearing2);
@@ -679,47 +683,10 @@ int main(int argc, char** argv)
     h_EoP_DA[i]->Rebin(2);
     h_EoP_MC[i]->Rebin(2);
      
-//     h_EoP_MC[i]->Smooth(2);
-//     h_EoP_DA[i]->Smooth(2);
-
     float xNorm = h_EoP_DA[i]->Integral()/h_EoP_MC[i]->Integral()*h_EoP_DA[i]->GetBinWidth(1)/h_EoP_MC[i]->GetBinWidth(1);  
     float xNormEt = h_Ht[i]->Integral()/h_Ht_MC[i]->Integral(); //*h_Ht[i]->GetBinWidth()/h_Ht_MC[i]->GetBinWidth();  
     h_EoP_MC[i]->Scale(xNorm);
     h_Ht_MC[i]->Scale(xNormEt);
-
-//     std::cout << " i = " << i << " h_EoP_DA[i]->Integral() = " << h_EoP_DA[i]->Integral() << std::endl;
-//     std::cout << " i = " << i << " h_Ht[i]->Integral() = " << h_Ht[i]->Integral() << std::endl;
-//     std::cout << " i = " << i << " h_EoP_MC[i]->Integral() = " << h_EoP_MC[i]->Integral() << std::endl;
-//     std::cout << " i = " << i << " h_Ht_MC[i]->Integral() = " << h_Ht_MC[i]->Integral() << std::endl;
-
-
-
-
-//     std::cout << " i = " << i << " h_EoP_DA[i]->Integral() = " << h_EoP_DA[i]->Integral() << std::endl;
-//     std::cout << " i = " << i << " h_EoP_MC[i]->Integral() = " << h_EoP_MC[i]->Integral() << std::endl;
-//     std::cout << " xNorm = " << xNorm << std::endl;
-//     std::cout << " xNormEt = " << xNormEt << std::endl;
-
-
-    
-    //    xNorm_single.push_back(xNormEt);
-//     if(h_R9[i]->GetMean() < 0.94 && h_R9_MC[i]->GetMean() < 0.94) {
-//     h_EoP_DA[i]->Rebin(2);
-//     h_EoP_MC[i]->Rebin(2);
-//     }
-
-//     float mid = h_EoP_DA[i]->GetBinCenter(h_EoP_DA[i] -> GetMaximumBin());
-//     float x_min = mid*0.65;
-//     float x_max = mid*1.7;
-
-
-//     float x_min = 1.;
-//     float x_max = 1.;
-//     for(int nBinsHisto = 1; nBinsHisto < h_EoP_DA[i]->GetNbinsX(); ++nBinsHisto){
-//       if(h_EoP_DA[i]->GetBinContent(nBinsHisto) > 10. && x_min == 1.) x_min = h_EoP_DA[i]->GetBinCenter(nBinsHisto);
-//       if(h_EoP_DA[i]->GetBinContent(nBinsHisto) < 10. && x_min != 1. && x_max == 1.) x_max = h_EoP_DA[i]->GetBinCenter(nBinsHisto);
-//     }
-
 
     histoFunc* templateHistoFunc = new histoFunc(h_EoP_MC[i]);
     char funcName[50];
@@ -728,11 +695,6 @@ int main(int argc, char** argv)
     f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.9, 1.1, 3, "histoFunc");
     //    if(std::string(EBEE) != "EBEB")    f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.6, 1.2, 3, "histoFunc");
 
-//     histoFunc* templateHistoFunc = new histoFunc(h_EoP_MC[i]);
-//     char funcName[50];
-//     sprintf(funcName,"f_EoP_%d",i);
-//    f_EoP[i] = new TF1(funcName, templateHistoFunc, 0.8, 1.3, 3, "histoFunc");
-    
     f_EoP[i] -> SetParName(0,"Norm"); 
     f_EoP[i] -> SetParName(1,"Scale factor"); 
     f_EoP[i] -> SetLineWidth(1); 
@@ -741,8 +703,8 @@ int main(int argc, char** argv)
     xNorm = 1.;    
 
     f_EoP[i] -> FixParameter(0, xNorm);
-    //    f_EoP[i] -> SetParameter(1, gRandom->Gaus(1.,0.005));
-    f_EoP[i] -> SetParameter(1, 0.99);
+    f_EoP[i] -> SetParameter(1, gRandom->Gaus(1.,0.005));
+    //    f_EoP[i] -> SetParameter(1, 0.99);
     f_EoP[i] -> FixParameter(2, 0.);
     f_EoP[i] -> SetLineColor(kRed+2); 
 

@@ -5,8 +5,12 @@
 #include "DataFormats/DetId/interface/DetId.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHit.h"
+#include "CalibCalorimetry/EcalLaserCorrection/interface/EcalLaserDbService.h"
+#include "DataFormats/Provenance/interface/Timestamp.h"
 
 #include<vector>
+
+typedef unsigned long long TimeValue_t;
 
 class CaloVShape              ;
 class CaloVSimParameterMap    ;
@@ -50,7 +54,17 @@ class EcalHitResponse
 
       void setPECorrection( const CaloVPECorrection* peCorrection ) ;
 
+      void setEventTime(const edm::TimeValue_t& iTime);
+
+      void setLaserConstants(const EcalLaserDbService* laser, bool& useLCcorrection);
+
       void add( const EcalSamples* pSam ) ;
+
+      virtual void add( const PCaloHit&  hit ) ;
+
+      virtual void initializeHits() ;
+
+      virtual void finalizeHits() ;
 
       virtual void run( MixCollection<PCaloHit>& hits ) ;
 
@@ -61,6 +75,8 @@ class EcalHitResponse
       virtual const EcalSamples* operator[]( unsigned int i ) const = 0;
 
       const EcalSamples* findDetId( const DetId& detId ) const ;
+
+      bool withinBunchRange(int bunchCrossing) const ;
 
    protected:
 
@@ -74,9 +90,11 @@ class EcalHitResponse
 
       virtual void putAnalogSignal( const PCaloHit& inputHit) ;
 
+      double findLaserConstant(const DetId& detId) const;
+
       EcalSamples* findSignal( const DetId& detId ) ;
 
-      double analogSignalAmplitude( const PCaloHit& hit ) const;
+      double analogSignalAmplitude( const DetId& id, float energy ) const;
 
       double timeOfFlight( const DetId& detId ) const ;
 
@@ -112,6 +130,7 @@ class EcalHitResponse
       const CaloVPECorrection*       m_PECorrection  ;
       const CaloVHitFilter*          m_hitFilter     ;
       const CaloSubdetectorGeometry* m_geometry      ;
+      const EcalLaserDbService*      m_lasercals     ;
 
       mutable CLHEP::RandPoissonQ*   m_RandPoisson   ;
       mutable CLHEP::RandGaussQ*     m_RandGauss     ;
@@ -119,6 +138,9 @@ class EcalHitResponse
       int    m_minBunch   ;
       int    m_maxBunch   ;
       double m_phaseShift ;
+
+      edm::TimeValue_t               m_iTime;
+      bool                           m_useLCcorrection;
 
       VecInd m_index ;
 };

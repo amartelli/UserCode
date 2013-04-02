@@ -210,10 +210,14 @@ process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary
 
 # Additional output definition
 process.AODSIMoutput.outputCommands.append('keep *_rawDataCollector_*_*')
-process.AODSIMoutput.outputCommands.append('keep *DigiCollection_*_*_*')
-process.AODSIMoutput.outputCommands.append('keep *EcalRecHit_*_*_*')
-process.AODSIMoutput.outputCommands.append('keep *_ecalRecHit_*_*')
-process.AODSIMoutput.outputCommands.append('keep *_ecalPreshowerRecHit_*_*')
+process.AODSIMoutput.outputCommands.append('keep *_simEcalUnsuppressedDigis_*_*')
+process.AODSIMoutput.outputCommands.append('keep *_*_ebDigis_*')
+process.AODSIMoutput.outputCommands.append('keep *_*_eeDigis_*')
+process.AODSIMoutput.outputCommands.append('keep *_*_EcalRecHitsEB_*')
+process.AODSIMoutput.outputCommands.append('keep *_*_EcalRecHitsEE_*')
+process.AODSIMoutput.outputCommands.append('keep *_*_EcalRecHitsES_*')
+process.AODSIMoutput.outputCommands.append('keep *_simEcalPreshowerDigis_*_*')
+process.AODSIMoutput.outputCommands.append('keep *_ecalPreshowerDigis_*_*')
 
 if completeApproach:
     process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('DYToLL_M_50_TuneZ2star_8TeV_pythia6_tauola_cff_py_complete.root')

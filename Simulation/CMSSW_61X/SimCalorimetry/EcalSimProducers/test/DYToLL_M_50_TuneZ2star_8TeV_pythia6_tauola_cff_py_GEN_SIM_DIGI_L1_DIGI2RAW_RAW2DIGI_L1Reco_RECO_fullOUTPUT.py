@@ -5,9 +5,9 @@
 # with command line options: Configuration/Generator/python/DYToLL_M_50_TuneZ2star_8TeV_pythia6_tauola_cff.py -s GEN:ProductionFilterSequence,SIM,DIGI,L1,DIGI2RAW,RAW2DIGI,L1Reco,RECO --conditions START61_V11::All --datatier AODSIM --eventcontent AODSIM -n 10 --no_exec
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('RECO')
+process = cms.Process('DIGIRECO')
 
-completeApproach = True
+completeApproach = False
 effectiveApproach = True
 
 from SimG4Core.Application.g4SimHits_cfi import g4SimHits
@@ -45,7 +45,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(1)
 )
 
 
@@ -88,7 +88,16 @@ if effectiveApproach:
 
 
 # Input source
-process.source = cms.Source("EmptySource")
+process.source = cms.Source(
+    "PoolSource",
+    fileNames = cms.untracked.vstring(
+#'/store/mc/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/GEN-SIM/START50_V13-v1/0004/58605CAA-A66B-E111-80AF-001E4F1C5820.root'
+    'file:/afs/cern.ch/user/a/amartell/eos/cms/store/caf/user/amartell/Simulation/GEN_SIM/NuGunPt2-20/FEAAA370-4781-E111-B733-0025B3E06510.root'
+#    'file:/afs/cern.ch/user/a/amartell/eos/cms/store/caf/user/amartell/Simulation/MB/1AD9E627-7316-E111-B3A5-001A9281173C.root'
+    )
+    )
+
+#process.source = cms.Source("EmptySource")
 
 process.options = cms.untracked.PSet(
 
@@ -103,18 +112,18 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # Output definition
 process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
-                                        compressionLevel = cms.untracked.int32(4),
-                                        compressionAlgorithm = cms.untracked.string('LZMA'),
-                                        eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
+#                                        compressionLevel = cms.untracked.int32(4),
+#                                        compressionAlgorithm = cms.untracked.string('LZMA'),
+#                                        eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
                                         outputCommands = process.AODSIMEventContent.outputCommands,
-                                        fileName = cms.untracked.string('DYToLL_M_50_TuneZ2star_8TeV_pythia6_tauola_cff_py_standard.root'),
-                                        dataset = cms.untracked.PSet(
-                                            filterName = cms.untracked.string(''),
-                                            dataTier = cms.untracked.string('AODSIM')
-                                            ),
-                                        SelectEvents = cms.untracked.PSet(
-                                            SelectEvents = cms.vstring('generation_step')
-                                            )
+                                        fileName = cms.untracked.string('DYToLLM50_standard_sc1.root')
+#                                        dataset = cms.untracked.PSet(
+#                                            filterName = cms.untracked.string(''),
+#                                            dataTier = cms.untracked.string('AODSIM')
+#                                            ),
+#                                        SelectEvents = cms.untracked.PSet(
+#                                            SelectEvents = cms.vstring('generation_step')
+#                                            )
                                         )
 
 
@@ -193,8 +202,8 @@ process.ProductionFilterSequence = cms.Sequence(process.generator)
 
 
 # Path and EndPath definitions
-process.generation_step = cms.Path(process.ProductionFilterSequence)
-process.simulation_step = cms.Path(process.psim)
+#process.generation_step = cms.Path(process.ProductionFilterSequence)
+#process.simulation_step = cms.Path(process.psim)
 process.digitisation_step = cms.Path(process.pdigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.digi2raw_step = cms.Path(process.DigiToRaw)
@@ -206,10 +215,12 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.AODSIMoutput_step = cms.EndPath(process.AODSIMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step,process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.AODSIMoutput_step)
+#process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step,process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.AODSIMoutput_step)
+process.schedule = cms.Schedule(process.digitisation_step,process.L1simulation_step,process.digi2raw_step,process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.AODSIMoutput_step)
 
 # Additional output definition
 process.AODSIMoutput.outputCommands.append('keep *_rawDataCollector_*_*')
+#process.AODSIMoutput.outputCommands.append('keep *_simEcalUnsuppressedDigis_APD_*')
 process.AODSIMoutput.outputCommands.append('keep *_simEcalUnsuppressedDigis_*_*')
 process.AODSIMoutput.outputCommands.append('keep *_*_ebDigis_*')
 process.AODSIMoutput.outputCommands.append('keep *_*_eeDigis_*')
@@ -218,11 +229,16 @@ process.AODSIMoutput.outputCommands.append('keep *_*_EcalRecHitsEE_*')
 process.AODSIMoutput.outputCommands.append('keep *_*_EcalRecHitsES_*')
 process.AODSIMoutput.outputCommands.append('keep *_simEcalPreshowerDigis_*_*')
 process.AODSIMoutput.outputCommands.append('keep *_ecalPreshowerDigis_*_*')
+#process.AODSIMoutput.outputCommands.append('keep *DigiCollection_*_*_*')
+#process.AODSIMoutput.outputCommands.append('keep *EcalRecHit_*_*_*')
+#process.AODSIMoutput.outputCommands.append('keep *_ecalRecHit_*_*')
+#process.AODSIMoutput.outputCommands.append('keep *_ecalPreshowerRecHit_*_*')
+#process.AODSIMoutput.outputCommands.append('drop *EcalRecHit_mix_*_*')
 
 if completeApproach:
-    process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('DYToLL_M_50_TuneZ2star_8TeV_pythia6_tauola_cff_py_complete.root')
+    process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('MinBias_complete_sc1.root')
 if effectiveApproach:
-    process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('DYToLL_M_50_TuneZ2star_8TeV_pythia6_tauola_cff_py_effective.root')
+    process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('MinBias_effective_sc1.root')
 
 
 

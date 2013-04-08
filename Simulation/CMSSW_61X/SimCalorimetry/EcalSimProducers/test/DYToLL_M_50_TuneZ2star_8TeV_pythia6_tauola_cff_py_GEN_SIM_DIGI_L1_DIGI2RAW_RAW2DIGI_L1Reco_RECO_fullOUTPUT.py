@@ -105,7 +105,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('Configuration/Generator/python/DYToLL_M_50_TuneZ2star_8TeV_pythia6_tauola_cff.py nevts:10'),
     name = cms.untracked.string('Applications')
 )
@@ -236,9 +236,9 @@ process.AODSIMoutput.outputCommands.append('keep *_ecalPreshowerDigis_*_*')
 #process.AODSIMoutput.outputCommands.append('drop *EcalRecHit_mix_*_*')
 
 if completeApproach:
-    process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('MinBias_complete_sc1.root')
+    process.AODSIMoutput.fileName = cms.untracked.string('DYToLLM50_complete_sc1.root')
 if effectiveApproach:
-    process.AODSIMoutput.outputCommands.fileName = cms.untracked.string('MinBias_effective_sc1.root')
+    process.AODSIMoutput.fileName = cms.untracked.string('DYToLLM50_effective_sc1.root')
 
 
 

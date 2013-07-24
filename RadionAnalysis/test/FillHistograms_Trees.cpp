@@ -4,6 +4,7 @@
 #include "ParserUtils.h"
 #include "setTDRStyle.h"
 #include "drawPlotsUtils.h"
+#include "DiJetKinFitter.h"
 
 #include "TROOT.h"
 #include "TStyle.h"
@@ -26,6 +27,11 @@
 #include "TVector3.h"
 #include "THStack.h"
 #include "TPad.h"
+#include "TMVA/MsgLogger.h"
+#include "TMVA/Config.h"
+#include "TMVA/Tools.h"
+#include "TMVA/Factory.h"
+#include "TMVA/Reader.h"
 
 #include <iostream>
 #include <iomanip>
@@ -36,6 +42,22 @@
 #include <algorithm>
 #include <math.h>
 #include <vector>
+
+float nvtx;
+float j1_eta;
+float j2_eta;
+float j3_eta;
+float j4_eta;
+float j1_betaStarClassic;
+float j2_betaStarClassic;
+float j3_betaStarClassic;
+float j4_betaStarClassic;
+float j1_dR2Mean;
+float j2_dR2Mean;
+float j3_dR2Mean;
+float j4_dR2Mean;
+
+bool passCutBasedJetId(int jet);
 
 int main(int argc, char** argv)
 {
@@ -51,7 +73,7 @@ int main(int argc, char** argv)
 
   // Input parameters
 
-  //  bool printOk = true;
+  //bool printOk = true;
   bool printOk = false;
   
   std::cout << "\n*******************************************************************************************************************" << std::endl;
@@ -69,6 +91,9 @@ int main(int argc, char** argv)
   
   std::string inputList = gConfigParser -> readStringOption("Input::inputList");
   std::string inputTree = gConfigParser -> readStringOption("Input::inputTree");
+  
+  bool useBJetRegression = gConfigParser -> readBoolOption("Input::useBJetRegression");
+  std::string inputRegFile = gConfigParser -> readStringOption("Input::inputRegFile");
   
   std::string outputName = gConfigParser -> readStringOption("Output::outputName");
   
@@ -122,11 +147,43 @@ int main(int argc, char** argv)
          return -1;
       }
   }
+
+  // vectors for jets
+  float ptcorrjet[4], ecorrjet[4],ptuncorrjet[4];
+  float etajet[4], phijet[4];              
+  float btagjprobjet[4], btagcsvjet[4];
+  float cefjet[4], chfjet[4];
+  float vtxPtjet[4], vtx3dljet[4];
+  float nconstjet[4];
+  
+  float fRegr_pt, fRegr_eta, fRegr_cef, fRegr_chf;
+  float fRegr_nconst;
+  float fRegr_vtxPt, fRegr_vtx3dl;
+  float fRegr_met, fRegr_dPhiMet;
+  
+  TMVA::Reader *readerRegres = new TMVA::Reader( "!Color:!Silent" );
+  if(useBJetRegression){
+  readerRegres->AddVariable( "jet_pt",            &fRegr_pt);
+  readerRegres->AddVariable( "jet_eta",           &fRegr_eta);
+  readerRegres->AddVariable( "jet_emfrac",        &fRegr_cef);
+  readerRegres->AddVariable( "jet_nConstituents", &fRegr_nconst);
+  readerRegres->AddVariable( "jet_hadfrac",       &fRegr_chf);
+  readerRegres->AddVariable( "jet_secVtxPt",      &fRegr_vtxPt);
+  readerRegres->AddVariable( "jet_secVtx3dL",     &fRegr_vtx3dl);
+  readerRegres->AddVariable( "ev_met_corr_pfmet",  &fRegr_met);
+  readerRegres->AddVariable( "jet_dPhiMet",        &fRegr_dPhiMet);
+  readerRegres->BookMVA("BDT",inputRegFile.c_str());
+  }
   
   float         pu_n;
   float         weight_an;
   float         evweight;
   float         pu_weight;
+
+  float         met_corr_pfmet;
+  float         met_corr_phi_pfmet;
+  float         met_corr_eta_pfmet;
+  float         met_corr_e_pfmet;
 
   int           ph1_ciclevel;
   int           ph2_ciclevel;
@@ -157,6 +214,8 @@ int main(int argc, char** argv)
   float         ph2_phi;
   float         ph1_eta;
   float         ph2_eta;
+  float         ph1_SCEta;
+  float         ph2_SCEta;
   float         ph1_r9;
   float         ph2_r9;
   float         ph1_hoe;
@@ -181,43 +240,55 @@ int main(int argc, char** argv)
   float         j1_e;
   float         j1_pt;
   float         j1_phi;
-  float         j1_eta;
-  float         j1_betaStarClassic;
   float         j1_csvBtag;
+  float         j1_jetProbBtag; 
   float         j1_csvMvaBtag;
-  float         j1_jetProbBtag;
   float         j1_tcheBtag;
-  float         j1_radionMatched;
+  float         j1_emfrac;
+  float         j1_hadfrac;
+  float         j1_secVtxPt;
+  float         j1_secVtx3dL;
+  int           j1_nNeutrals;
+  int           j1_nCharged;
   float         j2_e;
   float         j2_pt;
   float         j2_phi;
-  float         j2_eta;
-  float         j2_betaStarClassic;
   float         j2_csvBtag;
-  float         j2_csvMvaBtag;
   float         j2_jetProbBtag;
+  float         j2_csvMvaBtag;
   float         j2_tcheBtag;
-  float         j2_radionMatched;
+  float         j2_emfrac;
+  float         j2_secVtxPt;
+  float         j2_secVtx3dL;
+  int           j2_nNeutrals;
+  int           j2_nCharged;
+  float         j2_hadfrac;
   float         j3_e;
   float         j3_pt;
   float         j3_phi;
-  float         j3_eta;
-  float         j3_betaStarClassic;
   float         j3_csvBtag;
-  float         j3_csvMvaBtag;
   float         j3_jetProbBtag;
+  float         j3_csvMvaBtag;
   float         j3_tcheBtag;
-  float         j3_radionMatched;
+  float         j3_emfrac;
+  float         j3_hadfrac;
+  float         j3_secVtxPt;
+  float         j3_secVtx3dL;
+  int           j3_nNeutrals;
+  int           j3_nCharged;
   float         j4_e;
   float         j4_pt;
   float         j4_phi;
-  float         j4_eta;
-  float         j4_betaStarClassic;
   float         j4_csvBtag;
-  float         j4_csvMvaBtag;
   float         j4_jetProbBtag;
+  float         j4_csvMvaBtag;
   float         j4_tcheBtag;
-  float         j4_radionMatched;
+  float         j4_emfrac;
+  float         j4_hadfrac;
+  float         j4_secVtxPt;
+  float         j4_secVtx3dL;
+  int           j4_nNeutrals;
+  int           j4_nCharged;
   float         JetsMass;
   float         dijet_E;
 //   float         dijet_pt;
@@ -228,6 +299,7 @@ int main(int argc, char** argv)
 //   float         radion_pt;
 //   float         radion_eta;
 //   float         radion_phi;
+  int           njets_passing_kLooseID;
   
   for(int ii = 0; ii < pos_total; ii++){
       ntu[ii]->SetBranchStatus("*",0);
@@ -235,6 +307,12 @@ int main(int argc, char** argv)
       ntu[ii]->SetBranchStatus("weight",1);
       ntu[ii]->SetBranchStatus("evweight",1);
       ntu[ii]->SetBranchStatus("pu_weight",1);
+      ntu[ii]->SetBranchStatus("nvtx",1);
+
+      ntu[ii]->SetBranchStatus("met_corr_pfmet",1);
+      ntu[ii]->SetBranchStatus("met_corr_phi_pfmet",1);
+      ntu[ii]->SetBranchStatus("met_corr_eta_pfmet",1);
+      ntu[ii]->SetBranchStatus("met_corr_e_pfmet",1);
 
       ntu[ii]->SetBranchStatus("ph1_ciclevel",1);
       ntu[ii]->SetBranchStatus("ph2_ciclevel",1);
@@ -264,6 +342,8 @@ int main(int argc, char** argv)
       ntu[ii]->SetBranchStatus("ph2_phi",1);
       ntu[ii]->SetBranchStatus("ph1_eta",1);
       ntu[ii]->SetBranchStatus("ph2_eta",1);
+      ntu[ii]->SetBranchStatus("ph1_SCEta",1);
+      ntu[ii]->SetBranchStatus("ph2_SCEta",1);
       ntu[ii]->SetBranchStatus("ph1_r9",1);
       ntu[ii]->SetBranchStatus("ph2_r9",1);
       ntu[ii]->SetBranchStatus("ph1_hoe",1);
@@ -287,42 +367,66 @@ int main(int argc, char** argv)
       ntu[ii]->SetBranchStatus("j1_pt",1);
       ntu[ii]->SetBranchStatus("j1_phi",1);
       ntu[ii]->SetBranchStatus("j1_eta",1);
-      ntu[ii]->SetBranchStatus("j1_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j1_csvBtag",1);
-      ntu[ii]->SetBranchStatus("j1_csvMvaBtag",1);
+      ntu[ii]->SetBranchStatus("j1_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j1_jetProbBtag",1);
+      ntu[ii]->SetBranchStatus("j1_csvMvaBtag",1);
       ntu[ii]->SetBranchStatus("j1_tcheBtag",1);
-      ntu[ii]->SetBranchStatus("j1_radionMatched",1);
+      ntu[ii]->SetBranchStatus("j1_emfrac",1);
+      ntu[ii]->SetBranchStatus("j1_hadfrac",1);
+      ntu[ii]->SetBranchStatus("j1_secVtxPt",1);
+      ntu[ii]->SetBranchStatus("j1_secVtx3dL",1);
+      ntu[ii]->SetBranchStatus("j1_nNeutrals",1);
+      ntu[ii]->SetBranchStatus("j1_nCharged",1);
+      ntu[ii]->SetBranchStatus("j1_dR2Mean",1);
       ntu[ii]->SetBranchStatus("j2_e",1);
       ntu[ii]->SetBranchStatus("j2_pt",1);
       ntu[ii]->SetBranchStatus("j2_phi",1);
       ntu[ii]->SetBranchStatus("j2_eta",1);
-      ntu[ii]->SetBranchStatus("j2_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j2_csvBtag",1);
-      ntu[ii]->SetBranchStatus("j2_csvMvaBtag",1);
+      ntu[ii]->SetBranchStatus("j2_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j2_jetProbBtag",1);
+      ntu[ii]->SetBranchStatus("j2_csvMvaBtag",1);
       ntu[ii]->SetBranchStatus("j2_tcheBtag",1);
-      ntu[ii]->SetBranchStatus("j2_radionMatched",1);
+      ntu[ii]->SetBranchStatus("j2_emfrac",1);
+      ntu[ii]->SetBranchStatus("j2_hadfrac",1);
+      ntu[ii]->SetBranchStatus("j2_secVtxPt",1);
+      ntu[ii]->SetBranchStatus("j2_secVtx3dL",1);
+      ntu[ii]->SetBranchStatus("j2_nNeutrals",1);
+      ntu[ii]->SetBranchStatus("j2_nCharged",1);
+      ntu[ii]->SetBranchStatus("j2_dR2Mean",1);
       ntu[ii]->SetBranchStatus("j3_e",1);
       ntu[ii]->SetBranchStatus("j3_pt",1);
       ntu[ii]->SetBranchStatus("j3_phi",1);
       ntu[ii]->SetBranchStatus("j3_eta",1);
-      ntu[ii]->SetBranchStatus("j3_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j3_csvBtag",1);
-      ntu[ii]->SetBranchStatus("j3_csvMvaBtag",1);
+      ntu[ii]->SetBranchStatus("j3_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j3_jetProbBtag",1);
+      ntu[ii]->SetBranchStatus("j3_csvMvaBtag",1);
       ntu[ii]->SetBranchStatus("j3_tcheBtag",1);
-      ntu[ii]->SetBranchStatus("j3_radionMatched",1);
+      ntu[ii]->SetBranchStatus("j3_emfrac",1);
+      ntu[ii]->SetBranchStatus("j3_hadfrac",1);
+      ntu[ii]->SetBranchStatus("j3_secVtxPt",1);
+      ntu[ii]->SetBranchStatus("j3_secVtx3dL",1);
+      ntu[ii]->SetBranchStatus("j3_nNeutrals",1);
+      ntu[ii]->SetBranchStatus("j3_nCharged",1);
+      ntu[ii]->SetBranchStatus("j3_dR2Mean",1);
       ntu[ii]->SetBranchStatus("j4_e",1);
       ntu[ii]->SetBranchStatus("j4_pt",1);
       ntu[ii]->SetBranchStatus("j4_phi",1);
       ntu[ii]->SetBranchStatus("j4_eta",1);
-      ntu[ii]->SetBranchStatus("j4_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j4_csvBtag",1);
-      ntu[ii]->SetBranchStatus("j4_csvMvaBtag",1);
+      ntu[ii]->SetBranchStatus("j4_betaStarClassic",1);
       ntu[ii]->SetBranchStatus("j4_jetProbBtag",1);
+      ntu[ii]->SetBranchStatus("j4_csvMvaBtag",1);
       ntu[ii]->SetBranchStatus("j4_tcheBtag",1);
-      ntu[ii]->SetBranchStatus("j4_radionMatched",1);
+      ntu[ii]->SetBranchStatus("j4_emfrac",1);
+      ntu[ii]->SetBranchStatus("j4_hadfrac",1);
+      ntu[ii]->SetBranchStatus("j4_secVtxPt",1);
+      ntu[ii]->SetBranchStatus("j4_secVtx3dL",1);
+      ntu[ii]->SetBranchStatus("j4_nNeutrals",1);
+      ntu[ii]->SetBranchStatus("j4_nCharged",1);
+      ntu[ii]->SetBranchStatus("j4_dR2Mean",1);
       ntu[ii]->SetBranchStatus("JetsMass",1);
       ntu[ii]->SetBranchStatus("dijet_E",1);
 //       ntu[ii]->SetBranchStatus("dijet_pt",1);
@@ -332,10 +436,17 @@ int main(int argc, char** argv)
 //       ntu[ii]->SetBranchStatus("radion_pt",1);
 //       ntu[ii]->SetBranchStatus("radion_eta",1);
 //       ntu[ii]->SetBranchStatus("radion_phi",1);
+      ntu[ii]->SetBranchStatus("njets_passing_kLooseID",1);
       ntu[ii]->SetBranchAddress("pu_n",&pu_n);
       ntu[ii]->SetBranchAddress("weight",&weight_an);
       ntu[ii]->SetBranchAddress("evweight",&evweight);
       ntu[ii]->SetBranchAddress("pu_weight",&pu_weight);
+      ntu[ii]->SetBranchAddress("nvtx",&nvtx);
+
+      ntu[ii]->SetBranchAddress("met_corr_pfmet",&met_corr_pfmet);
+      ntu[ii]->SetBranchAddress("met_corr_phi_pfmet",&met_corr_phi_pfmet);
+      ntu[ii]->SetBranchAddress("met_corr_eta_pfmet",&met_corr_eta_pfmet);
+      ntu[ii]->SetBranchAddress("met_corr_e_pfmet",&met_corr_e_pfmet);
 
       ntu[ii]->SetBranchAddress("ph1_ciclevel",&ph1_ciclevel);
       ntu[ii]->SetBranchAddress("ph2_ciclevel",&ph2_ciclevel);
@@ -365,6 +476,8 @@ int main(int argc, char** argv)
       ntu[ii]->SetBranchAddress("ph2_phi",&ph2_phi);
       ntu[ii]->SetBranchAddress("ph1_eta",&ph1_eta);
       ntu[ii]->SetBranchAddress("ph2_eta",&ph2_eta);
+      ntu[ii]->SetBranchAddress("ph1_SCEta",&ph1_SCEta);
+      ntu[ii]->SetBranchAddress("ph2_SCEta",&ph2_SCEta);
       ntu[ii]->SetBranchAddress("ph1_r9",&ph1_r9);
       ntu[ii]->SetBranchAddress("ph2_r9",&ph2_r9);
       ntu[ii]->SetBranchAddress("ph1_hoe",&ph1_hoe);
@@ -388,42 +501,66 @@ int main(int argc, char** argv)
       ntu[ii]->SetBranchAddress("j1_pt",&j1_pt);
       ntu[ii]->SetBranchAddress("j1_phi",&j1_phi);
       ntu[ii]->SetBranchAddress("j1_eta",&j1_eta);
-      ntu[ii]->SetBranchAddress("j1_betaStarClassic",&j1_betaStarClassic);
       ntu[ii]->SetBranchAddress("j1_csvBtag",&j1_csvBtag);
-      ntu[ii]->SetBranchAddress("j1_csvMvaBtag",&j1_csvMvaBtag);
+      ntu[ii]->SetBranchAddress("j1_betaStarClassic",&j1_betaStarClassic);
       ntu[ii]->SetBranchAddress("j1_jetProbBtag",&j1_jetProbBtag);
+      ntu[ii]->SetBranchAddress("j1_csvMvaBtag",&j1_csvMvaBtag);
       ntu[ii]->SetBranchAddress("j1_tcheBtag",&j1_tcheBtag);
-      ntu[ii]->SetBranchAddress("j1_radionMatched",&j1_radionMatched);
+      ntu[ii]->SetBranchAddress("j1_emfrac",&j1_emfrac);
+      ntu[ii]->SetBranchAddress("j1_hadfrac",&j1_hadfrac);
+      ntu[ii]->SetBranchAddress("j1_secVtxPt",&j1_secVtxPt);
+      ntu[ii]->SetBranchAddress("j1_secVtx3dL",&j1_secVtx3dL);
+      ntu[ii]->SetBranchAddress("j1_nNeutrals",&j1_nNeutrals);
+      ntu[ii]->SetBranchAddress("j1_nCharged",&j1_nCharged);
+      ntu[ii]->SetBranchAddress("j1_dR2Mean",&j1_dR2Mean);
       ntu[ii]->SetBranchAddress("j2_e",&j2_e);
       ntu[ii]->SetBranchAddress("j2_pt",&j2_pt);
       ntu[ii]->SetBranchAddress("j2_phi",&j2_phi);
       ntu[ii]->SetBranchAddress("j2_eta",&j2_eta);
-      ntu[ii]->SetBranchAddress("j2_betaStarClassic",&j2_betaStarClassic);
       ntu[ii]->SetBranchAddress("j2_csvBtag",&j2_csvBtag);
-      ntu[ii]->SetBranchAddress("j2_csvMvaBtag",&j2_csvMvaBtag);
+      ntu[ii]->SetBranchAddress("j2_betaStarClassic",&j2_betaStarClassic);
       ntu[ii]->SetBranchAddress("j2_jetProbBtag",&j2_jetProbBtag);
+      ntu[ii]->SetBranchAddress("j2_csvMvaBtag",&j2_csvMvaBtag);
       ntu[ii]->SetBranchAddress("j2_tcheBtag",&j2_tcheBtag);
-      ntu[ii]->SetBranchAddress("j2_radionMatched",&j2_radionMatched);
+      ntu[ii]->SetBranchAddress("j2_emfrac",&j2_emfrac);
+      ntu[ii]->SetBranchAddress("j2_hadfrac",&j2_hadfrac);
+      ntu[ii]->SetBranchAddress("j2_secVtxPt",&j2_secVtxPt);
+      ntu[ii]->SetBranchAddress("j2_secVtx3dL",&j2_secVtx3dL);
+      ntu[ii]->SetBranchAddress("j2_nNeutrals",&j2_nNeutrals);
+      ntu[ii]->SetBranchAddress("j2_nCharged",&j2_nCharged);
+      ntu[ii]->SetBranchAddress("j2_dR2Mean",&j2_dR2Mean);
       ntu[ii]->SetBranchAddress("j3_e",&j3_e);
       ntu[ii]->SetBranchAddress("j3_pt",&j3_pt);
       ntu[ii]->SetBranchAddress("j3_phi",&j3_phi);
       ntu[ii]->SetBranchAddress("j3_eta",&j3_eta);
-      ntu[ii]->SetBranchAddress("j3_betaStarClassic",&j3_betaStarClassic);
       ntu[ii]->SetBranchAddress("j3_csvBtag",&j3_csvBtag);
-      ntu[ii]->SetBranchAddress("j3_csvMvaBtag",&j3_csvMvaBtag);
+      ntu[ii]->SetBranchAddress("j3_betaStarClassic",&j3_betaStarClassic);
       ntu[ii]->SetBranchAddress("j3_jetProbBtag",&j3_jetProbBtag);
+      ntu[ii]->SetBranchAddress("j3_csvMvaBtag",&j3_csvMvaBtag);
       ntu[ii]->SetBranchAddress("j3_tcheBtag",&j3_tcheBtag);
-      ntu[ii]->SetBranchAddress("j3_radionMatched",&j3_radionMatched);
+      ntu[ii]->SetBranchAddress("j3_emfrac",&j3_emfrac);
+      ntu[ii]->SetBranchAddress("j3_hadfrac",&j3_hadfrac);
+      ntu[ii]->SetBranchAddress("j3_secVtxPt",&j3_secVtxPt);
+      ntu[ii]->SetBranchAddress("j3_secVtx3dL",&j3_secVtx3dL);
+      ntu[ii]->SetBranchAddress("j3_nNeutrals",&j3_nNeutrals);
+      ntu[ii]->SetBranchAddress("j3_nCharged",&j3_nCharged);
+      ntu[ii]->SetBranchAddress("j3_dR2Mean",&j3_dR2Mean);
       ntu[ii]->SetBranchAddress("j4_e",&j4_e);
       ntu[ii]->SetBranchAddress("j4_pt",&j4_pt);
       ntu[ii]->SetBranchAddress("j4_phi",&j4_phi);
       ntu[ii]->SetBranchAddress("j4_eta",&j4_eta);
-      ntu[ii]->SetBranchAddress("j4_betaStarClassic",&j4_betaStarClassic);
       ntu[ii]->SetBranchAddress("j4_csvBtag",&j4_csvBtag);
-      ntu[ii]->SetBranchAddress("j4_csvMvaBtag",&j4_csvMvaBtag);
+      ntu[ii]->SetBranchAddress("j4_betaStarClassic",&j4_betaStarClassic);
       ntu[ii]->SetBranchAddress("j4_jetProbBtag",&j4_jetProbBtag);
+      ntu[ii]->SetBranchAddress("j4_csvMvaBtag",&j4_csvMvaBtag);
       ntu[ii]->SetBranchAddress("j4_tcheBtag",&j4_tcheBtag);
-      ntu[ii]->SetBranchAddress("j4_radionMatched",&j4_radionMatched);
+      ntu[ii]->SetBranchAddress("j4_emfrac",&j4_emfrac);
+      ntu[ii]->SetBranchAddress("j4_hadfrac",&j4_hadfrac);
+      ntu[ii]->SetBranchAddress("j4_secVtxPt",&j4_secVtxPt);
+      ntu[ii]->SetBranchAddress("j4_secVtx3dL",&j4_secVtx3dL);
+      ntu[ii]->SetBranchAddress("j4_nNeutrals",&j4_nNeutrals);
+      ntu[ii]->SetBranchAddress("j4_nCharged",&j4_nCharged);
+      ntu[ii]->SetBranchAddress("j4_dR2Mean",&j4_dR2Mean);
       ntu[ii]->SetBranchAddress("JetsMass",&JetsMass);
       ntu[ii]->SetBranchAddress("dijet_E",&dijet_E);
 //       ntu[ii]->SetBranchAddress("dijet_pt",&dijet_pt);
@@ -433,10 +570,10 @@ int main(int argc, char** argv)
 //       ntu[ii]->SetBranchAddress("radion_pt",&radion_pt);
 //       ntu[ii]->SetBranchAddress("radion_eta",&radion_eta);
 //       ntu[ii]->SetBranchAddress("radion_phi",&radion_phi);
-      
+      ntu[ii]->SetBranchAddress("njets_passing_kLooseID",&njets_passing_kLooseID);   
   }
 
-  int nSTEP = 13;
+  int nSTEP = 20;
 
   std::vector<TH1F*>  h_vtx_ind;
   std::vector<TH1F*>  h_PhoEcalIso;
@@ -498,6 +635,7 @@ int main(int argc, char** argv)
   std::vector<TH1F*>  h_diPhodiJetInvMass_bveto;
   std::vector<TH1F*>  h_diPhodiJetInvMass_core_bveto;
   std::vector<TH1F*>  h_diPhodiJetInvMass_sidebands_bveto;
+  std::vector<TH1F*>  h_diPhodiJetInvMass_kinfit;
 
   /////////////////////////////////////////////////////
   for(int nstep = 0; nstep<nSTEP; ++nstep){
@@ -564,6 +702,7 @@ int main(int argc, char** argv)
     h_diPhodiJetInvMass_bveto.push_back(new TH1F(("h_diPhodiJetInvMass_bveto"+stepName).c_str(),"",120,0.,1200));
     h_diPhodiJetInvMass_core_bveto.push_back(new TH1F(("h_diPhodiJetInvMass_core_bveto"+stepName).c_str(),"",120,0.,1200));
     h_diPhodiJetInvMass_sidebands_bveto.push_back(new TH1F(("h_diPhodiJetInvMass_sidebands_bveto"+stepName).c_str(),"",120,0.,1200));
+    h_diPhodiJetInvMass_kinfit.push_back(new TH1F(("h_diPhodiJetInvMass_kinfit"+stepName).c_str(),"",120,0.,1200));
   }
   /////////////////////////////////////////////////////
 
@@ -578,6 +717,7 @@ int main(int argc, char** argv)
   TLorentzVector* PhoSumP4;
   std::map<int,TLorentzVector*> JetSumP4;
 
+  std::map<int,bool> bad_jet_pre;
   std::map<int,bool> bad_jet;
   
   std::map<int,bool> isBTagCouple;
@@ -593,12 +733,32 @@ int main(int argc, char** argv)
   int numPassingEvents[nSTEP];
   for(int nLocStep = 0; nLocStep<nSTEP; ++nLocStep) numPassingEvents[nLocStep] = 0;
 
+  std::vector<int> event_selSTEP;
+
+  std::vector<float> jjPt;
+  std::map<float,std::pair<int,int> > jjPt_map;
+
+  TLorentzVector* Hgg;
+  TLorentzVector* Hjj; 
+  TLorentzVector* Radion;
+
+  float Hmass = 125.;
+  DiJetKinFitter* fitter_jetsH = new DiJetKinFitter( "fitter_jetsH", "fitter_jets", Hmass );
+ 
   for(int nn = 0; nn < pos_total; nn++){
       for(int ientry = 0; ientry < ntu[nn]->GetEntries(); ientry++){
-          if(ientry%100000==0) std::cout<<"--- Reading file_" << nn << " entry = "<< ientry <<std::endl;
+          if(ientry%1000==0) std::cout<<"--- Reading file_" << nn << " entry = "<< ientry <<std::endl;
           ntu[nn]->GetEntry(ientry);
 
-	  int Step_Counter = -1;
+          bool isfinal_event = true;
+
+          int n_good_jets_pre = 0;
+          int n_good_jets = 0;
+          int n_b_jets_pre = 0;
+          int n_b_jets = 0;
+
+          bool isbad = false;
+	  int Step_Counter = 0;
 	  if(printOk) 	  std::cout << " Step_Counter = " << Step_Counter << std::endl;
 
 	  if(printOk)	  std::cout << "--- Reading file_" << nn << " entry = " << ientry << std::endl;
@@ -607,9 +767,93 @@ int main(int argc, char** argv)
           float puRe = 1.;
           puRe = evweight;
 
+          // --------------------------------------------------------------------------------
+          //preparing vectors with the infos used later on
+          ecorrjet[0]     = j1_e;           
+          ecorrjet[1]     = j2_e;           
+          ecorrjet[2]     = j3_e;           
+          ecorrjet[3]     = j4_e;
+          ptcorrjet[0]    = j1_pt;          
+          ptcorrjet[1]    = j2_pt;          
+          ptcorrjet[2]    = j3_pt;          
+          ptcorrjet[3]    = j4_pt;
+          ptuncorrjet[0]  = j1_pt;          
+          ptuncorrjet[1]  = j2_pt;          
+          ptuncorrjet[2]  = j3_pt;          
+          ptuncorrjet[3]  = j4_pt;
+          etajet[0]       = j1_eta;         
+          etajet[1]       = j2_eta;         
+          etajet[2]       = j3_eta;        
+          etajet[3]       = j4_eta;
+          phijet[0]       = j1_phi;         
+          phijet[1]       = j2_phi;         
+          phijet[2]       = j3_phi;        
+          phijet[3]       = j4_phi;
+          btagjprobjet[0] = j1_jetProbBtag; 
+          btagjprobjet[1] = j2_jetProbBtag; 
+          btagjprobjet[2] = j3_jetProbBtag; 
+          btagjprobjet[3] = j4_jetProbBtag;
+          btagcsvjet[0]   = j1_csvBtag;     
+          btagcsvjet[1]   = j2_csvBtag;     
+          btagcsvjet[2]   = j3_csvBtag;    
+          btagcsvjet[3]   = j4_csvBtag;
+          cefjet[0]       = j1_emfrac;      
+          cefjet[1]       = j2_emfrac;      
+          cefjet[2]       = j3_emfrac;      
+          cefjet[3]       = j4_emfrac;
+          chfjet[0]       = j1_hadfrac;     
+          chfjet[1]       = j2_hadfrac;     
+          chfjet[2]       = j3_hadfrac;     
+          chfjet[3]       = j4_hadfrac;
+          vtxPtjet[0]     = j1_secVtxPt;    
+          vtxPtjet[1]     = j2_secVtxPt;    
+          vtxPtjet[2]     = j3_secVtxPt;    
+          vtxPtjet[3]     = j4_secVtxPt;
+          vtx3dljet[0]    = j1_secVtx3dL;   
+          vtx3dljet[1]    = j2_secVtx3dL;   
+          vtx3dljet[2]    = j3_secVtx3dL;   
+          vtx3dljet[3]    = j4_secVtx3dL;
+          nconstjet[0]    = (float)(j1_nNeutrals + j1_nCharged);   
+          nconstjet[1]    = (float)(j2_nNeutrals + j2_nCharged);
+          nconstjet[2]    = (float)(j3_nNeutrals + j3_nCharged);
+          nconstjet[3]    = (float)(j4_nNeutrals + j4_nCharged);
+
+          //----------------------------------------------------------------------------------
+          
+          // applying the jet regression
+          if(useBJetRegression){
+           
+           TVector3 tempT3jet, t3met;
+           t3met.SetPtEtaPhi(met_corr_pfmet, 0, met_corr_phi_pfmet);               
+           for (int ii=0; ii<4; ii++) {
+	       
+               if ( ptcorrjet[ii]<-1) continue;
+	
+	       fRegr_pt      = ptcorrjet[ii];
+	       fRegr_eta     = etajet[ii];
+	       fRegr_cef     = cefjet[ii];
+	       fRegr_nconst  = nconstjet[ii];
+	       fRegr_chf     = chfjet[ii];
+	       fRegr_vtxPt   = vtxPtjet[ii];
+	       fRegr_vtx3dl  = vtx3dljet[ii];
+	       fRegr_met = met_corr_pfmet;
+	       tempT3jet.SetPtEtaPhi(ptcorrjet[ii], etajet[ii], phijet[ii]);
+	       fRegr_dPhiMet = tempT3jet.DeltaPhi(t3met);
+	
+	       float thePtCorr = 10000;
+	       thePtCorr = (float)(readerRegres->EvaluateMVA("BDT"));
+                  
+               // corrected pT and energy 
+	       float correctionFactor = thePtCorr/ptcorrjet[ii]; 
+	       ptcorrjet[ii] = thePtCorr;  
+	       ecorrjet[ii] *= correctionFactor;
+            
+           }
+          }
+
 	  //ALLEVTS (0)
 	  ++numPassingEvents[Step_Counter];
-	  ++Step_Counter;
+          event_selSTEP.push_back(Step_Counter);  
 
           pho_pt = new std::vector<float>;
           jet_pt = new std::vector<float>;
@@ -664,13 +908,9 @@ int main(int argc, char** argv)
 	  */
 	  //	  if(Photon1SuperTIGHT_passe && Photon2SuperTIGHT_passe) diPhotonSuperTIGHT_passe = true;
 
-	  if(printOk)     std::cout << "--- prima di diPhotonSuperTIGHT_passe = " << diPhotonSuperTIGHT_passe << std::endl;
-	  if(diPhotonSuperTIGHT_passe == false) continue;
-
-	  //CIC Hgg (1)
-	  ++numPassingEvents[Step_Counter];
-	  ++Step_Counter;
-
+         if((TMath::Abs(ph1_SCEta)>1.4442&&TMath::Abs(ph1_SCEta)<1.566)||(TMath::Abs(ph2_SCEta)>1.4442&&TMath::Abs(ph2_SCEta)<1.566)
+       || TMath::Abs(ph1_SCEta)>2.5 || TMath::Abs(ph2_SCEta)>2.5) continue;
+          
 	  ///////////////////////////////////////////////////////////
 	  TLorentzVector diPhoton1;
 	  diPhoton1.SetPtEtaPhiE(ph1_pt,ph1_eta,ph1_phi,ph1_e);
@@ -681,23 +921,57 @@ int main(int argc, char** argv)
 
 	  if(printOk)     std::cout << "--- diPhoton.M() = " << diPhoton.M() << std::endl;
 
-	  if(ph1_pt > ph2_pt && (ph2_pt < 25 || ph1_pt < diPhoton.M()/3.) ) continue;
-	  if(ph2_pt > ph2_pt && (ph1_pt < 25 || ph2_pt < diPhoton.M()/3.) ) continue;
+	  if(ph1_pt > ph2_pt && (ph2_pt < 25 || ph1_pt < diPhoton.M()/3.) ) isbad = true;;
+	  if(ph2_pt > ph1_pt && (ph1_pt < 25 || ph2_pt < diPhoton.M()/3.) ) isbad = true;
+          
+          //PhotonPt cut (1)
+          ++Step_Counter;
+          if(isbad == false){
+	     ++numPassingEvents[Step_Counter];
+             event_selSTEP.push_back(Step_Counter);
+          }
+         
+          isbad = false;
 
-	  if(diPhoton.M() < 100. || diPhoton.M() > 180.) continue;
+          if(printOk)     std::cout << "--- prima di diPhotonSuperTIGHT_passe = " << diPhotonSuperTIGHT_passe << std::endl;
+	  if(diPhotonSuperTIGHT_passe == false) isbad = true;
 
+          //CIC Hgg + PhotonPt cut(2)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++)
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false; 
 
-	  //CIC Hgg + DiMass cut 100-180 (2)
-	  ++numPassingEvents[Step_Counter];
-	  ++Step_Counter;
+	  if(diPhoton.M() < 100. || diPhoton.M() > 180.) isbad = true;;
+
+          //CIC Hgg + DiMass cut 100-180 + PhotonPt cut (3)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = false;  
 
 	  if(printOk) {
 	  std::cout << " h_vtx_ind.size() = " << h_vtx_ind.size() << std::endl;
 	  std::cout << " Step_Counter = " << Step_Counter << std::endl;
 	  }
-	  //	  if(printOk)     std::cout << "--- before new variables " << std::endl;
-
-	  h_vtx_ind.at(Step_Counter)->Fill(vtx_ind, puRe);
+	  //	  if(printOk)     std::cout << "--- before new variables " << std::endl
 
 
 	  //save photons
@@ -725,6 +999,473 @@ int main(int argc, char** argv)
 	  for(std::map<float,int>::iterator it=phoPt_map.begin(); it!=phoPt_map.end(); ++it)
 	      std::cout << it->first << " => " << it->second << '\n';
 	  }
+
+         //------------------- Jets Selections -------------------//
+        
+          jet_csvBtag[0] = j1_csvBtag;
+          jet_csvMvaBtag[0] = j1_csvMvaBtag;
+          jet_jetProbBtag[0] = j1_jetProbBtag;
+          jet_tcheBtag[0] = j1_tcheBtag;
+
+          jet_csvBtag[1] = j2_csvBtag;
+          jet_csvMvaBtag[1] = j2_csvMvaBtag;
+          jet_jetProbBtag[1] = j2_jetProbBtag;
+          jet_tcheBtag[1] = j2_tcheBtag;
+
+          jet_csvBtag[2] = j3_csvBtag;
+          jet_csvMvaBtag[2] = j3_csvMvaBtag;
+          jet_jetProbBtag[2] = j3_jetProbBtag;
+          jet_tcheBtag[2] = j3_tcheBtag;
+
+          jet_csvBtag[3] = j4_csvBtag;
+          jet_csvMvaBtag[3] = j4_csvMvaBtag;
+          jet_jetProbBtag[3] = j4_jetProbBtag;
+          jet_tcheBtag[3] = j4_tcheBtag;
+
+
+          for(int ii = 0; ii < 4; ii++)
+              bad_jet_pre[ii] = false;
+         
+          for (int ij=0; ij<4; ij++){ 
+               if ( ptcorrjet[ij]< -1)               bad_jet_pre[ij] = true;
+               //if ( btagcsvjet[ij]<=0)               bad_jet_pre[ij] = true;
+          }
+          for (int ij=0; ij<4; ij++){ 
+               if(bad_jet_pre[ij] == true) continue;
+               n_good_jets_pre++;
+          }
+          for(int ii = 0; ii < 4; ii++)
+              bad_jet[ii] = false;
+
+          for (int ij=0; ij<4; ij++) { 
+               if ( ptcorrjet[ij]<-1)               bad_jet[ij] = true;
+               if ( btagcsvjet[ij]<=0)              bad_jet[ij] = true;
+               if ( ptcorrjet[ij] < 25. )           bad_jet[ij] = true;
+               if ( fabs(etajet[ij])>2.5 )          bad_jet[ij] = true;
+               if ( !passCutBasedJetId(ij) )        bad_jet[ij] = true;
+          }
+
+          for(int ii = 0; ii < 4; ii++){
+              jetP4[ii] = new TLorentzVector();
+              jetP4[ii]->SetPtEtaPhiE(ptcorrjet[ii],etajet[ii],phijet[ii],ecorrjet[ii]);
+              if(bad_jet[ii] == true) continue;
+              n_good_jets++;
+          }
+           
+          for(int ii = 0; ii < 4; ii++)
+              if(jet_csvBtag[ii] > btag_wp && bad_jet_pre[ii] == false) n_b_jets_pre++;
+
+          for(int ii = 0; ii < 4; ii++)
+              if(jet_csvBtag[ii] > btag_wp && bad_jet[ii] == false) n_b_jets++;
+
+          if(n_good_jets_pre < 2) isbad = true; 
+           
+          //NJets >= 2 (4)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = false;
+
+          if(n_b_jets_pre < 1 || n_good_jets_pre < 2) isbad = true; 
+
+	  //NBJets >= 1 (5)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = false;
+
+          if(n_good_jets < 2) isbad = true; 
+           
+          //NJets >= 2 (6)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = true;
+
+          if(n_b_jets >= 1 && n_good_jets >= 2) isbad = false; 
+
+	  //NBJets >= 1 (7)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = true;
+
+          if(n_b_jets == 1 && n_good_jets  >= 2) isbad = false; 
+          
+	  //NBJets == 1 (8)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-1) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = true;
+            
+          if(n_b_jets >= 2 && n_good_jets  >= 2) isbad = false; 
+
+          //NBJets >= 2 (9)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = true;
+
+          float invMass_Mjj = 0;
+          
+          bool btagged[4] ={0,0,0,0};
+          int j1,j2;
+         
+         for(int ii = 0; ii < 4; ii++){
+
+              if(bad_jet[ii] == true) continue;
+              
+              if(jet_csvBtag[ii] > 0.679) btagged[ii] = true;
+            
+          }
+
+          for(int ii = 0; ii < 4; ii++){
+            
+              if(bad_jet[ii] == true) continue;
+
+              for(int jj = 0; jj < 4; jj++){
+
+                  if(bad_jet[jj] == true) continue;
+
+                  if(ii == jj) continue;
+
+                  sumP4 = new TLorentzVector();
+
+                  *sumP4 = *jetP4[ii]+*jetP4[jj];
+                   
+                  if(n_b_jets == 1)
+                     if(btagged[ii] == true || btagged[jj] == true){
+                        jjPt.push_back(sumP4->Pt());
+                        jjPt_map.insert(std::pair<float,std::pair<int,int> >(sumP4->Pt(),std::pair<int,int>(ii,jj)));
+                     }
+
+                  if(n_b_jets >= 2)
+                     if(btagged[ii] == true && btagged[jj] == true){
+                        jjPt.push_back(sumP4->Pt());
+                        jjPt_map.insert(std::pair<float,std::pair<int,int> >(sumP4->Pt(),std::pair<int,int>(ii,jj)));
+                     }
+
+                  delete sumP4;
+              }
+              
+          }
+
+          std::sort(jjPt.begin(),jjPt.end());
+         
+          if(n_b_jets >= 1 && n_good_jets >= 2){
+            j1 = jjPt_map[jjPt.at(jjPt.size()-1)].first;
+            j2 = jjPt_map[jjPt.at(jjPt.size()-1)].second;
+          }else{
+           j1 = 0;
+           j2 = 1;
+           isfinal_event = false;
+          }
+         
+          jjPt.clear();
+          jjPt_map.clear();
+
+          Hgg = new TLorentzVector();
+          *Hgg = *phoP4[0]+*phoP4[1];  
+          Hjj = new TLorentzVector();
+          *Hjj = *jetP4[j1]+*jetP4[j2];
+          Radion = new TLorentzVector();
+          *Radion = *Hgg + *Hjj;
+          Hgg->Boost(-Radion->BoostVector());
+          
+          isbad = true;
+
+          if(fabs(Hgg->CosTheta()) < 0.9 && n_b_jets == 1 && n_good_jets  >= 2) isbad = false;
+
+          //1BJet and |costheta*| < 0.9 (10)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+           
+          isbad = true;
+
+          if(fabs(Hgg->CosTheta()) < 0.9 && n_b_jets >= 2 && n_good_jets  >= 2) isbad = false;
+
+          //2BJet and |costheta*| < 0.9 (11)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+         
+          delete Hgg;
+          delete Hjj;
+          delete Radion;
+             
+          sumP4 = new TLorentzVector();
+
+          *sumP4 = *jetP4[j1]+*jetP4[j2];
+           
+          invMass_Mjj = sumP4->M();
+
+          delete sumP4;
+
+          if(n_b_jets == 1 && (invMass_Mjj < 90. || invMass_Mjj > 150.)) isbad = true;
+         
+          //1BJet and mjj cut (12)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+
+          if(n_b_jets >= 2 && (invMass_Mjj < 95. || invMass_Mjj > 140.)) isbad = true;
+         
+          //2BJet and mjj cut (13)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+
+          TVector3 t3phot1, t3phot2;
+          t3phot1.SetPtEtaPhi(phoP4[0]->Pt(),phoP4[0]->Eta(),phoP4[0]->Phi());
+          t3phot2.SetPtEtaPhi(phoP4[1]->Pt(),phoP4[1]->Eta(),phoP4[1]->Phi());
+          TLorentzVector t4phot1, t4phot2;
+          t4phot1.SetPtEtaPhiE(phoP4[0]->Pt(),phoP4[0]->Eta(),phoP4[0]->Phi(),phoP4[0]->Energy());
+          t4phot2.SetPtEtaPhiE(phoP4[1]->Pt(),phoP4[1]->Eta(),phoP4[1]->Phi(),phoP4[1]->Energy());
+          
+          TVector3 t3jet1, t3jet2;
+          TLorentzVector t4jet1, t4jet2;
+          if(n_b_jets >= 1 && n_good_jets >= 2){
+             t3jet1.SetPtEtaPhi(jetP4[j1]->Pt(),jetP4[j1]->Eta(),jetP4[j1]->Phi());
+             t3jet2.SetPtEtaPhi(jetP4[j2]->Pt(),jetP4[j2]->Eta(),jetP4[j2]->Phi());
+             t4jet1.SetPtEtaPhiE(jetP4[j1]->Pt(),jetP4[j1]->Eta(),jetP4[j1]->Phi(),jetP4[j1]->Energy());
+             t4jet2.SetPtEtaPhiE(jetP4[j2]->Pt(),jetP4[j2]->Eta(),jetP4[j2]->Phi(),jetP4[j2]->Energy());
+          }
+          
+          std::pair<TLorentzVector,TLorentzVector> jets_kinfitH;
+          if(n_b_jets >= 1 && n_good_jets >= 2) jets_kinfitH = fitter_jetsH->fit(t4jet1, t4jet2);
+          TLorentzVector jet1_kinfit, jet2_kinfit;
+          jet1_kinfit = jets_kinfitH.first;
+          jet2_kinfit = jets_kinfitH.second;
+
+          TLorentzVector t4diPhot = t4phot1+t4phot2;
+          TLorentzVector dijet_kinfit = jet1_kinfit + jet2_kinfit;
+          TLorentzVector Vstar_kinfit = dijet_kinfit + t4diPhot;
+           
+          float radMassKF = Vstar_kinfit.M();
+
+          if(n_b_jets == 1 && (radMassKF<260. || radMassKF>335.)) isbad = true;
+
+          //1BJet and mggjj cut (14)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+
+          if(n_b_jets >= 2 && (radMassKF<255. || radMassKF>320.)) isbad = true;
+
+          //2BJet and mggjj cut (15)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+          
+          float deltaR_g1b1;
+          float deltaR_g1b2;
+          float deltaR_g2b1;
+          float deltaR_g2b2;
+          if(n_b_jets >= 1 && n_good_jets >= 2){
+             deltaR_g1b1  = t4phot1.DeltaR(jet1_kinfit);
+             deltaR_g1b2  = t4phot1.DeltaR(jet2_kinfit);
+             deltaR_g2b1  = t4phot2.DeltaR(jet1_kinfit);
+             deltaR_g2b2  = t4phot2.DeltaR(jet2_kinfit);
+          }
+          float minDeltaR_gb;
+          if(n_b_jets >= 1 && n_good_jets >= 2){
+             minDeltaR_gb = deltaR_g1b1;
+             if ( deltaR_g1b2 < minDeltaR_gb ) minDeltaR_gb = deltaR_g1b2;
+             if ( deltaR_g2b1 < minDeltaR_gb ) minDeltaR_gb = deltaR_g2b1;
+             if ( deltaR_g2b2 < minDeltaR_gb ) minDeltaR_gb = deltaR_g2b2;
+          }
+          if (n_b_jets == 1 && minDeltaR_gb<1) isbad = true;
+
+          //1BJet and deltaR(g,j) cut (16)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+            
+          if (n_b_jets >= 2 && minDeltaR_gb<1) isbad = true;
+
+          //2BJet and deltaR(g,j) cut (17)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+          
+          isbad = false;
+
+          if (n_b_jets == 1 && njets_passing_kLooseID>=3) isbad = true;
+
+          //1BJet and njets cut (18)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = false;
+
+          if (n_b_jets >= 2 && njets_passing_kLooseID>=3) isbad = true;
+
+          //2BJet and njets cut (19)
+          ++Step_Counter;
+	  if(isbad == false){
+             isbad = true;
+             for(unsigned int ii = 0; ii < event_selSTEP.size(); ii++){
+                 if(event_selSTEP.at(ii) == Step_Counter-2) isbad = false;
+             }
+             if(isbad == false){
+	        ++numPassingEvents[Step_Counter];
+                event_selSTEP.push_back(Step_Counter);
+             }
+          }
+
+          isbad = false;
+
+          for(unsigned int nn = 0; nn < event_selSTEP.size(); nn++){
+               
+          Step_Counter = event_selSTEP.at(nn);
+
+          if(Step_Counter > 9)
+             if(isfinal_event == false) continue; 
+           
+          h_vtx_ind.at(Step_Counter)->Fill(vtx_ind, puRe);
+
+          h_JetNum.at(Step_Counter)->Fill(n_good_jets, puRe);
+          h_JetNum_btagged.at(Step_Counter)->Fill(n_b_jets, puRe);
 
 	  h_PhoEcalIso.at(Step_Counter)->Fill(ph1_ecaliso/ph1_pt, puRe);
 	  h_PhoEcalIso.at(Step_Counter)->Fill(ph2_ecaliso/ph2_pt, puRe);
@@ -788,105 +1529,18 @@ int main(int argc, char** argv)
 	  std::cout << " >>>> PhoSumP4 E " << PhoSumP4->E() << std::endl;
 	  }
 
-	  int n_bad_jets = 0;
-          for(int ii = 0; ii < 4; ii++)
-	    bad_jet[ii] = false;
-          
-          jetP4[0] = new TLorentzVector();
-          if(j1_pt != 0) jetP4[0]->SetPtEtaPhiE(j1_pt,j1_eta,j1_phi,j1_e);
-          else{
-	    if(jet_csvMvaBtag[0] < 0) std::cout << "PROOOBLEMMMMM :D " << std::endl;
-             bad_jet[0] = true;
-             n_bad_jets++;
-          }
-
-          jetP4[1] = new TLorentzVector();
-          if(j2_pt != 0) jetP4[1]->SetPtEtaPhiE(j2_pt,j2_eta,j2_phi,j2_e);
-          else{
-	    if(jet_csvMvaBtag[1] < 0) std::cout << "PROOOBLEMMMMM :D " << std::endl;
-             bad_jet[1] = true;
-             n_bad_jets++;
-          }
-
-          jetP4[2] = new TLorentzVector();
-          if(j3_pt != 0) jetP4[2]->SetPtEtaPhiE(j3_pt,j3_eta,j3_phi,j3_e);
-          else{
-	    if(jet_csvMvaBtag[2] < 0) std::cout << "PROOOBLEMMMMM :D " << std::endl;
-             bad_jet[2] = true;
-             n_bad_jets++;
-          }
-
-          jetP4[3] = new TLorentzVector();
-          if(j4_pt != 0) jetP4[3]->SetPtEtaPhiE(j4_pt,j4_eta,j4_phi,j4_e);
-          else{
-	    if(jet_csvMvaBtag[3] < 0) std::cout << "PROOOBLEMMMMM :D " << std::endl;
-             bad_jet[3] = true;
-             n_bad_jets++;
-          }
-
-	  //why Badder? tolto Ra
-	  if(n_bad_jets > 2) continue;
-
-	  //NJets >= 2 (3)
-	  ++numPassingEvents[Step_Counter];
-	  ++Step_Counter;
-
-          jet_csvBtag[0] = j1_csvBtag;
-          jet_csvMvaBtag[0] = j1_csvMvaBtag;
-          jet_jetProbBtag[0] = j1_jetProbBtag;
-          jet_tcheBtag[0] = j1_tcheBtag;
-
-          jet_csvBtag[1] = j2_csvBtag;
-          jet_csvMvaBtag[1] = j2_csvMvaBtag;
-          jet_jetProbBtag[1] = j2_jetProbBtag;
-          jet_tcheBtag[1] = j2_tcheBtag;
-
-          jet_csvBtag[2] = j3_csvBtag;
-          jet_csvMvaBtag[2] = j3_csvMvaBtag;
-          jet_jetProbBtag[2] = j3_jetProbBtag;
-          jet_tcheBtag[2] = j3_tcheBtag;
-
-          jet_csvBtag[3] = j4_csvBtag;
-          jet_csvMvaBtag[3] = j4_csvMvaBtag;
-          jet_jetProbBtag[3] = j4_jetProbBtag;
-          jet_tcheBtag[3] = j4_tcheBtag;
-      
-          for(int ii = 0; ii < 4; ii++)
-              if(jet_csvBtag[ii] < 0) bad_jet[ii] = true;
-
-          int jet_num = 0;
-          for(int ii = 0; ii < 4; ii++)
-              if(bad_jet[ii] == false) jet_num++;
-	  //	  if(jet_num != 4 - n_bad_jets) std::cout << "PROOOBLEMMMMM :D " << std::endl;
-
-	  //Why Badder? Tolto Ra
-	  //          if(jet_num < 2) continue;
-
-          h_JetNum.at(Step_Counter)->Fill(jet_num, puRe);
-
-          int n_bjets = 0;
-	  for(unsigned int ii = 0; ii < jet_csvBtag.size(); ii++){
-              if(bad_jet[ii] == true) continue;
-              if(jet_csvBtag[ii] > btag_wp ) n_bjets++;
-          }
-
-          if(n_bjets < 1) continue;
-
-	  //NBJets >= 1 (4)
-	  ++numPassingEvents[Step_Counter];
-	  ++Step_Counter;
-
-          h_JetNum_btagged.at(Step_Counter)->Fill(n_bjets, puRe);
-                   
           for(int ii = 0; ii < 4; ii++){
-	    if(bad_jet[ii] == true) continue;
+	      if(Step_Counter <= 3)
+                 if(bad_jet_pre[ii] == true) continue;
+              if(Step_Counter > 3)
+                 if(bad_jet[ii] == true) continue;
 	    if(printOk){
 	  std::cout << " >>>> jetP4[ii] Pt " << jetP4[ii]->Pt() << std::endl;
 	  std::cout << " >>>> jetP4[ii] Eta " << jetP4[ii]->Eta() << std::endl;
 	  std::cout << " >>>> jetP4[ii] Phi " << jetP4[ii]->Phi() << std::endl;
 	  std::cout << " >>>> jetP4[ii] E " << jetP4[ii]->E() << std::endl;
 	    }
-
+           
               h_JetPt.at(Step_Counter)->Fill(jetP4[ii]->Pt(),puRe); 
               h_JetEta.at(Step_Counter)->Fill(jetP4[ii]->Eta(),puRe);
               h_JetPhi.at(Step_Counter)->Fill(jetP4[ii]->Phi(),puRe);
@@ -901,16 +1555,28 @@ int main(int argc, char** argv)
           }
 
           jet_couple_num = 0;
-          
+
+          if(Step_Counter <= 9){
           for(int ii = 0; ii < 4; ii++){
-              if(bad_jet[ii] == true) continue;
+
+              if(Step_Counter <= 3)
+                 if(bad_jet_pre[ii] == true) continue;
+              if(Step_Counter > 3)
+                 if(bad_jet[ii] == true) continue;
+
               for(int jj = 0; jj < 4; jj++){
 
-                  if(bad_jet[jj] == true) continue;     
+                  if(Step_Counter <= 3)
+                     if(bad_jet_pre[jj] == true) continue;
+                  if(Step_Counter > 3)
+                     if(bad_jet[jj] == true) continue;    
+
                   if(ii == jj) continue;
+                  
                   h_diJetDeltaEta.at(Step_Counter)->Fill(jetP4[ii]->Eta()-jetP4[jj]->Eta(), puRe);
                   h_diJetDeltaPhi.at(Step_Counter)->Fill(jetP4[ii]->DeltaPhi(*jetP4[jj]),puRe);
                   h_diJetDeltaR.at(Step_Counter)->Fill(jetP4[ii]->DeltaR(*jetP4[jj]),puRe); 
+                  
                   sumP4 = new TLorentzVector();
                   *sumP4 = *jetP4[ii]+*jetP4[jj];
                   
@@ -930,9 +1596,19 @@ int main(int argc, char** argv)
                  jet_couple_num++;
               }
           }
+          }else{
+              h_diJetDeltaEta.at(Step_Counter)->Fill(jetP4[j1]->Eta()-jetP4[j2]->Eta(), puRe);
+              h_diJetDeltaPhi.at(Step_Counter)->Fill(jetP4[j1]->DeltaPhi(*jetP4[j2]),puRe);
+              h_diJetDeltaR.at(Step_Counter)->Fill(jetP4[j1]->DeltaR(*jetP4[j2]),puRe); 
+                  
+              sumP4 = new TLorentzVector();
+              *sumP4 = *jetP4[j1]+*jetP4[j2];
+                 
+              h_diJetInvMass.at(Step_Counter)->Fill(sumP4->M(),puRe);
 
-//           std::sort(pho_pt->begin(),pho_pt->end());
-//           std::sort(jet_pt->begin(),jet_pt->end());
+              delete sumP4;
+          }
+
 
 	  if(printOk)	  std::cout << " >>>> jetPt_map.size() = " << jetPt_map.size() << std::endl;
 
@@ -950,9 +1626,6 @@ int main(int argc, char** argv)
 	  for(std::map<float,int>::iterator it=jetPt_map.begin(); it!=jetPt_map.end(); ++it)
 	      std::cout << it->first << " => " << it->second << '\n';
 	  }
-//           h_diJetDeltaEta_maxpt.at(Step_Counter)->Fill(jetP4[jetPt_map->at(jet_pt->at(jet_pt->size()-1))]->Eta()-jetP4[jetPt_map->at(jet_pt->at(jet_pt->size()-2))]->Eta(), puRe);
-//           h_diJetDeltaPhi_maxpt.at(Step_Counter)->Fill(jetP4[jetPt_map->at(jet_pt->at(jet_pt->size()-1))]->DeltaPhi(*jetP4[jetPt_map->at(jet_pt->at(jet_pt->size()-2))]),puRe);
-//           h_diJetDeltaR_maxpt.at(Step_Counter)->Fill(jetP4[jetPt_map->at(jet_pt->at(jet_pt->size()-1))]->DeltaR(*jetP4[jetPt_map->at(jet_pt->at(jet_pt->size()-2))]),puRe); 
 
           h_diJetDeltaEta_maxpt.at(Step_Counter)->Fill(jetP4[itMaxJet]->Eta()-jetP4[itNextToMaxJet]->Eta(), puRe);
           h_diJetDeltaPhi_maxpt.at(Step_Counter)->Fill(jetP4[itMaxJet]->DeltaPhi(*jetP4[itNextToMaxJet]), puRe);
@@ -969,28 +1642,35 @@ int main(int argc, char** argv)
           for(int ii = 0; ii < 2; ii++)
               for(int jj = 0; jj < 4; jj++){
                    
-                if(bad_jet[jj] == true) continue;
+                  if(Step_Counter <= 3)
+                     if(bad_jet_pre[jj] == true) continue;
+                  if(Step_Counter > 3)
+                     if(bad_jet[jj] == true) continue;
 
                   h_PhoJetDeltaEta.at(Step_Counter)->Fill(phoP4[ii]->Eta()-jetP4[jj]->Eta(),puRe);
                   h_PhoJetDeltaPhi.at(Step_Counter)->Fill(phoP4[ii]->DeltaPhi(*jetP4[jj]),puRe);
                   h_PhoJetDeltaR.at(Step_Counter)->Fill(phoP4[ii]->DeltaR(*jetP4[jj]),puRe);  
               }
-           
+          
           h_PhoJetDeltaEta_maxpt.at(Step_Counter)->Fill(phoP4[itMaxPho]->Eta()-jetP4[itMaxJet]->Eta(),puRe);
           h_PhoJetDeltaPhi_maxpt.at(Step_Counter)->Fill(phoP4[itMaxPho]->DeltaPhi(*jetP4[itMaxJet]),puRe);
           h_PhoJetDeltaR_maxpt.at(Step_Counter)->Fill(phoP4[itMaxPho]->DeltaR(*jetP4[itMaxJet]),puRe);
            
           for(int ii = 0; ii < 4; ii++){
                
-	    if(bad_jet[ii] == true) continue;
-	    if(jet_csvBtag[ii] < btag_wp) continue;
+	      if(Step_Counter <= 3)
+                 if(bad_jet_pre[ii] == true) continue;
+              if(Step_Counter > 3)
+                 if(bad_jet[ii] == true) continue;
+	      if(jet_csvBtag[ii] < btag_wp) continue;
 
               h_PhoJetDeltaEta_maxpt_btag.at(Step_Counter)->Fill(phoP4[itMaxPho]->Eta() - jetP4[ii]->Eta(),puRe);
               h_PhoJetDeltaPhi_maxpt_btag.at(Step_Counter)->Fill(phoP4[itMaxPho]->DeltaPhi(*jetP4[ii]),puRe);
               h_PhoJetDeltaR_maxpt_btag.at(Step_Counter)->Fill(phoP4[itMaxPho]->DeltaR(*jetP4[ii]),puRe);
 
           }
-
+ 
+          if(Step_Counter <= 9){
           for(unsigned int jj = 0; jj < JetSumP4.size(); jj++){
       
                   h_diPhodiJetDeltaEta.at(Step_Counter)->Fill(PhoSumP4->Eta()-JetSumP4[jj]->Eta(),puRe);
@@ -1020,6 +1700,19 @@ int main(int argc, char** argv)
                   
                   delete sumP4;
           }
+          }else{
+              sumP4 = new TLorentzVector();
+              *sumP4 = *jetP4[j1] + *jetP4[j2];
+               h_diPhodiJetDeltaEta.at(Step_Counter)->Fill(PhoSumP4->Eta()-sumP4->Eta(),puRe);
+               h_diPhodiJetDeltaPhi.at(Step_Counter)->Fill(PhoSumP4->DeltaPhi(*sumP4),puRe);
+               h_diPhodiJetDeltaR.at(Step_Counter)->Fill(PhoSumP4->DeltaR(*sumP4),puRe); 
+               delete sumP4;
+               sumP4 = new TLorentzVector();
+              *sumP4 = *jetP4[j1] + *jetP4[j2] + *PhoSumP4;
+               h_diPhodiJetInvMass.at(Step_Counter)->Fill(sumP4->M(),puRe);
+               if(Step_Counter >= 14) h_diPhodiJetInvMass_kinfit.at(Step_Counter)->Fill(radMassKF,puRe);
+               delete sumP4;
+          }
 
           sumP4 = new TLorentzVector();
            
@@ -1032,6 +1725,8 @@ int main(int argc, char** argv)
 	  
           delete sumP4;
           }
+           
+          }
 
           for(int ii = 0; ii < 2; ii++)
               delete phoP4[ii];
@@ -1041,14 +1736,17 @@ int main(int argc, char** argv)
 
           for(int ii = 0; ii < 4; ii++)
               bad_jet[ii] = false;
+          
+          for(int ii = 0; ii < 4; ii++)
+              bad_jet_pre[ii] = false;
 
           delete pho_pt; 
           delete jet_pt; 
-//           delete phoPt_map;
-//           delete jetPt_map;
-         
+    
 	  phoPt_map.clear();
-	  jetPt_map.clear();              
+	  jetPt_map.clear();    
+          event_selSTEP.clear();
+       
       }
   }
 
@@ -1121,9 +1819,42 @@ int main(int argc, char** argv)
   h_diPhodiJetInvMass_bveto.at(nLocStep)->Write();
   h_diPhodiJetInvMass_core_bveto.at(nLocStep)->Write();
   h_diPhodiJetInvMass_sidebands_bveto.at(nLocStep)->Write();
+  h_diPhodiJetInvMass_kinfit.at(nLocStep)->Write();
   }
   output->Close();
   
+}
+
+bool passCutBasedJetId(int jet) {
+
+  bool isGood = true;
+
+  float etajet[4],thebetastarjet[4], thermsjet[4];  
+  etajet[0]         = j1_eta;  
+  etajet[1]         = j2_eta; 
+  etajet[2]         = j3_eta;   
+  etajet[3]         = j4_eta;  
+  thebetastarjet[0] = j1_betaStarClassic;
+  thebetastarjet[1] = j2_betaStarClassic;
+  thebetastarjet[2] = j3_betaStarClassic;
+  thebetastarjet[3] = j4_betaStarClassic;
+  thermsjet[0]      = j1_dR2Mean;
+  thermsjet[1]      = j2_dR2Mean;
+  thermsjet[2]      = j3_dR2Mean;
+  thermsjet[3]      = j4_dR2Mean;
+
+  if ( fabs(etajet[jet]) < 2.5 ) {
+    if ( thebetastarjet[jet] > 0.2 * log( nvtx - 0.64) )  isGood = false;
+    if (thermsjet[jet] > 0.06)                            isGood = false;
+  } 
+  else if (fabs(etajet[jet]) < 3.){
+    if ( thermsjet[jet] > 0.05)  isGood =false;
+  } 
+  else {
+    if ( thermsjet[jet] > 0.055) isGood =false;
+  }
+
+  return isGood;
 }
 
 

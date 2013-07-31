@@ -2,7 +2,6 @@
 #include "PUreweightingUtils.h"
 #include "ConfigParser.h"
 #include "ParserUtils.h"
-//#include "Preselection.h"
 #include "setTDRStyle.h"
 #include "drawPlotsUtils.h"
 #include "DiJetKinFitter.h"
@@ -47,8 +46,6 @@
 #include <math.h>
 #include <vector>
 
-bool passCutBasedJetId(int jet);
-
 float nvtx;
 float j1_eta;
 float j2_eta;
@@ -62,6 +59,9 @@ float j1_dR2Mean;
 float j2_dR2Mean;
 float j3_dR2Mean;
 float j4_dR2Mean;
+
+bool passCutBasedJetId(int jet);
+float weight_err(float jet1, float jet1_err,float jet2, float jet2_err,float weight, float rho);
 
 int main(int argc, char** argv)
 {
@@ -188,6 +188,12 @@ int main(int argc, char** argv)
   float         j1_weight;
   float         j1_weight_min;
   float         j1_weight_max;
+  float         j1_weight_05min;
+  float         j1_weight_05max;
+  float         j1_weight_15min;
+  float         j1_weight_15max;
+  float         j1_weight_20min;
+  float         j1_weight_20max;
   float         j1_csvBtag;
   float         j1_jetProbBtag; 
   float         j1_emfrac;
@@ -203,6 +209,12 @@ int main(int argc, char** argv)
   float         j2_weight;
   float         j2_weight_min;
   float         j2_weight_max;
+  float         j2_weight_05min;
+  float         j2_weight_05max;
+  float         j2_weight_15min;
+  float         j2_weight_15max;
+  float         j2_weight_20min;
+  float         j2_weight_20max;
   float         j2_csvBtag;
   float         j2_jetProbBtag;
   float         j2_emfrac;
@@ -218,6 +230,12 @@ int main(int argc, char** argv)
   float         j3_weight;
   float         j3_weight_min;
   float         j3_weight_max;
+  float         j3_weight_05min;
+  float         j3_weight_05max;
+  float         j3_weight_15min;
+  float         j3_weight_15max;
+  float         j3_weight_20min;
+  float         j3_weight_20max;
   float         j3_csvBtag;
   float         j3_jetProbBtag;
   float         j3_emfrac;
@@ -233,6 +251,12 @@ int main(int argc, char** argv)
   float         j4_weight;
   float         j4_weight_min;
   float         j4_weight_max;
+  float         j4_weight_05min;
+  float         j4_weight_05max;
+  float         j4_weight_15min;
+  float         j4_weight_15max;
+  float         j4_weight_20min;
+  float         j4_weight_20max;
   float         j4_csvBtag;
   float         j4_jetProbBtag;
   float         j4_emfrac;
@@ -260,6 +284,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchStatus("j1_weight",1);
   ntu_weight->SetBranchStatus("j1_weight_max",1);
   ntu_weight->SetBranchStatus("j1_weight_min",1);
+  ntu_weight->SetBranchStatus("j1_weight_05max",1);
+  ntu_weight->SetBranchStatus("j1_weight_05min",1);
+  ntu_weight->SetBranchStatus("j1_weight_15max",1);
+  ntu_weight->SetBranchStatus("j1_weight_15min",1);
+  ntu_weight->SetBranchStatus("j1_weight_20max",1);
+  ntu_weight->SetBranchStatus("j1_weight_20min",1);
   ntu_weight->SetBranchStatus("j2_phi",1);
   ntu_weight->SetBranchStatus("j2_eta",1);
   ntu_weight->SetBranchStatus("j2_pt",1);
@@ -268,6 +298,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchStatus("j2_weight",1);
   ntu_weight->SetBranchStatus("j2_weight_max",1);
   ntu_weight->SetBranchStatus("j2_weight_min",1);
+  ntu_weight->SetBranchStatus("j2_weight_05max",1);
+  ntu_weight->SetBranchStatus("j2_weight_05min",1);
+  ntu_weight->SetBranchStatus("j2_weight_15max",1);
+  ntu_weight->SetBranchStatus("j2_weight_15min",1);
+  ntu_weight->SetBranchStatus("j2_weight_20max",1);
+  ntu_weight->SetBranchStatus("j2_weight_20min",1);
   ntu_weight->SetBranchStatus("j3_phi",1);
   ntu_weight->SetBranchStatus("j3_eta",1);
   ntu_weight->SetBranchStatus("j3_pt",1);
@@ -276,6 +312,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchStatus("j3_weight",1);
   ntu_weight->SetBranchStatus("j3_weight_max",1);
   ntu_weight->SetBranchStatus("j3_weight_min",1);
+  ntu_weight->SetBranchStatus("j3_weight_05max",1);
+  ntu_weight->SetBranchStatus("j3_weight_05min",1);
+  ntu_weight->SetBranchStatus("j3_weight_15max",1);
+  ntu_weight->SetBranchStatus("j3_weight_15min",1);
+  ntu_weight->SetBranchStatus("j3_weight_20max",1);
+  ntu_weight->SetBranchStatus("j3_weight_20min",1);
   ntu_weight->SetBranchStatus("j4_phi",1);
   ntu_weight->SetBranchStatus("j4_eta",1);
   ntu_weight->SetBranchStatus("j4_pt",1);
@@ -284,6 +326,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchStatus("j4_weight",1);
   ntu_weight->SetBranchStatus("j4_weight_max",1);
   ntu_weight->SetBranchStatus("j4_weight_min",1);
+  ntu_weight->SetBranchStatus("j4_weight_05max",1);
+  ntu_weight->SetBranchStatus("j4_weight_05min",1);
+  ntu_weight->SetBranchStatus("j4_weight_15max",1);
+  ntu_weight->SetBranchStatus("j4_weight_15min",1);
+  ntu_weight->SetBranchStatus("j4_weight_20max",1);
+  ntu_weight->SetBranchStatus("j4_weight_20min",1);
   ntu_weight->SetBranchAddress("event",&event);
   ntu_weight->SetBranchAddress("lumis",&lumis);
   ntu_weight->SetBranchAddress("j1_phi",&j1_phi);
@@ -294,6 +342,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchAddress("j1_weight",&j1_weight);
   ntu_weight->SetBranchAddress("j1_weight_max",&j1_weight_max);
   ntu_weight->SetBranchAddress("j1_weight_min",&j1_weight_min);
+  ntu_weight->SetBranchAddress("j1_weight_05max",&j1_weight_05max);
+  ntu_weight->SetBranchAddress("j1_weight_05min",&j1_weight_05min);
+  ntu_weight->SetBranchAddress("j1_weight_15max",&j1_weight_15max);
+  ntu_weight->SetBranchAddress("j1_weight_15min",&j1_weight_15min);
+  ntu_weight->SetBranchAddress("j1_weight_20max",&j1_weight_20max);
+  ntu_weight->SetBranchAddress("j1_weight_20min",&j1_weight_20min);
   ntu_weight->SetBranchAddress("j2_phi",&j2_phi);
   ntu_weight->SetBranchAddress("j2_eta",&j2_eta);
   ntu_weight->SetBranchAddress("j2_pt",&j2_pt);
@@ -302,6 +356,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchAddress("j2_weight",&j2_weight);
   ntu_weight->SetBranchAddress("j2_weight_max",&j2_weight_max);
   ntu_weight->SetBranchAddress("j2_weight_min",&j2_weight_min);
+  ntu_weight->SetBranchAddress("j2_weight_05max",&j2_weight_05max);
+  ntu_weight->SetBranchAddress("j2_weight_05min",&j2_weight_05min);
+  ntu_weight->SetBranchAddress("j2_weight_15max",&j2_weight_15max);
+  ntu_weight->SetBranchAddress("j2_weight_15min",&j2_weight_15min);
+  ntu_weight->SetBranchAddress("j2_weight_20max",&j2_weight_20max);
+  ntu_weight->SetBranchAddress("j2_weight_20min",&j2_weight_20min);
   ntu_weight->SetBranchAddress("j3_phi",&j3_phi);
   ntu_weight->SetBranchAddress("j3_eta",&j3_eta);
   ntu_weight->SetBranchAddress("j3_pt",&j3_pt);
@@ -310,6 +370,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchAddress("j3_weight",&j3_weight);
   ntu_weight->SetBranchAddress("j3_weight_max",&j3_weight_max);
   ntu_weight->SetBranchAddress("j3_weight_min",&j3_weight_min);
+  ntu_weight->SetBranchAddress("j3_weight_05max",&j3_weight_05max);
+  ntu_weight->SetBranchAddress("j3_weight_05min",&j3_weight_05min);
+  ntu_weight->SetBranchAddress("j3_weight_15max",&j3_weight_15max);
+  ntu_weight->SetBranchAddress("j3_weight_15min",&j3_weight_15min);
+  ntu_weight->SetBranchAddress("j3_weight_20max",&j3_weight_20max);
+  ntu_weight->SetBranchAddress("j3_weight_20min",&j3_weight_20min);
   ntu_weight->SetBranchAddress("j4_phi",&j4_phi);
   ntu_weight->SetBranchAddress("j4_eta",&j4_eta);
   ntu_weight->SetBranchAddress("j4_pt",&j4_pt);
@@ -318,6 +384,12 @@ int main(int argc, char** argv)
   ntu_weight->SetBranchAddress("j4_weight",&j4_weight);
   ntu_weight->SetBranchAddress("j4_weight_max",&j4_weight_max);
   ntu_weight->SetBranchAddress("j4_weight_min",&j4_weight_min);
+  ntu_weight->SetBranchAddress("j4_weight_05max",&j4_weight_05max);
+  ntu_weight->SetBranchAddress("j4_weight_05min",&j4_weight_05min);
+  ntu_weight->SetBranchAddress("j4_weight_15max",&j4_weight_15max);
+  ntu_weight->SetBranchAddress("j4_weight_15min",&j4_weight_15min);
+  ntu_weight->SetBranchAddress("j4_weight_20max",&j4_weight_20max);
+  ntu_weight->SetBranchAddress("j4_weight_20min",&j4_weight_20min);
   
   TLorentzVector p4;
   
@@ -327,6 +399,12 @@ int main(int argc, char** argv)
   std::map<float,std::map<float,std::vector<float> > > PREjet_weight;
   std::map<float,std::map<float,std::vector<float> > > PREjet_weight_max;
   std::map<float,std::map<float,std::vector<float> > > PREjet_weight_min;
+  std::map<float,std::map<float,std::vector<float> > > PREjet_weight_05max;
+  std::map<float,std::map<float,std::vector<float> > > PREjet_weight_05min;
+  std::map<float,std::map<float,std::vector<float> > > PREjet_weight_15max;
+  std::map<float,std::map<float,std::vector<float> > > PREjet_weight_15min;
+  std::map<float,std::map<float,std::vector<float> > > PREjet_weight_20max;
+  std::map<float,std::map<float,std::vector<float> > > PREjet_weight_20min;
   
   for(int ientry = 0; ientry < ntu_weight->GetEntries(); ientry++){
       ntu_weight->GetEntry(ientry);
@@ -364,6 +442,31 @@ int main(int argc, char** argv)
       PREjet_weight_min[lumis][event].push_back(j2_weight_min);
       PREjet_weight_min[lumis][event].push_back(j3_weight_min);
       PREjet_weight_min[lumis][event].push_back(j4_weight_min);
+      PREjet_weight_05max[lumis][event].push_back(j1_weight_05max);
+      PREjet_weight_05max[lumis][event].push_back(j2_weight_05max);
+      PREjet_weight_05max[lumis][event].push_back(j3_weight_05max);
+      PREjet_weight_05max[lumis][event].push_back(j4_weight_05max);
+      PREjet_weight_05min[lumis][event].push_back(j1_weight_05min);
+      PREjet_weight_05min[lumis][event].push_back(j2_weight_05min);
+      PREjet_weight_05min[lumis][event].push_back(j3_weight_05min);
+      PREjet_weight_05min[lumis][event].push_back(j4_weight_05min);
+      PREjet_weight_15max[lumis][event].push_back(j1_weight_15max);
+      PREjet_weight_15max[lumis][event].push_back(j2_weight_15max);
+      PREjet_weight_15max[lumis][event].push_back(j3_weight_15max);
+      PREjet_weight_15max[lumis][event].push_back(j4_weight_15max);
+      PREjet_weight_15min[lumis][event].push_back(j1_weight_15min);
+      PREjet_weight_15min[lumis][event].push_back(j2_weight_15min);
+      PREjet_weight_15min[lumis][event].push_back(j3_weight_15min);
+      PREjet_weight_15min[lumis][event].push_back(j4_weight_15min);
+      PREjet_weight_20max[lumis][event].push_back(j1_weight_20max);
+      PREjet_weight_20max[lumis][event].push_back(j2_weight_20max);
+      PREjet_weight_20max[lumis][event].push_back(j3_weight_20max);
+      PREjet_weight_20max[lumis][event].push_back(j4_weight_20max);
+      PREjet_weight_20min[lumis][event].push_back(j1_weight_20min);
+      PREjet_weight_20min[lumis][event].push_back(j2_weight_20min);
+      PREjet_weight_20min[lumis][event].push_back(j3_weight_20min);
+      PREjet_weight_20min[lumis][event].push_back(j4_weight_20min);
+      
      
   }
   
@@ -560,11 +663,23 @@ int main(int argc, char** argv)
   TH1F* h_diPhodiJet_InvMass_old_1btag = new TH1F("h_diPhodiJet_InvMass_old_1btag","h_diPhodiJet_InvMass_old_1btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_1btag = new TH1F("h_diPhodiJet_InvMass_1btag","h_diPhodiJet_InvMass_1btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_up_1btag = new TH1F("h_diPhodiJet_InvMass_up_1btag","h_diPhodiJet_InvMass_up_1btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_05up_1btag = new TH1F("h_diPhodiJet_InvMass_05up_1btag","h_diPhodiJet_InvMass_05up_1btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_15up_1btag = new TH1F("h_diPhodiJet_InvMass_15up_1btag","h_diPhodiJet_InvMass_15up_1btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_20up_1btag = new TH1F("h_diPhodiJet_InvMass_20up_1btag","h_diPhodiJet_InvMass_20up_1btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_down_1btag = new TH1F("h_diPhodiJet_InvMass_down_1btag","h_diPhodiJet_InvMass_down_1btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_05down_1btag = new TH1F("h_diPhodiJet_InvMass_05down_1btag","h_diPhodiJet_InvMass_05down_1btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_15down_1btag = new TH1F("h_diPhodiJet_InvMass_15down_1btag","h_diPhodiJet_InvMass_15down_1btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_20down_1btag = new TH1F("h_diPhodiJet_InvMass_20down_1btag","h_diPhodiJet_InvMass_20down_1btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_old_2btag = new TH1F("h_diPhodiJet_InvMass_old_2btag","h_diPhodiJet_InvMass_old_2btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_2btag = new TH1F("h_diPhodiJet_InvMass_2btag","h_diPhodiJet_InvMass_2btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_up_2btag = new TH1F("h_diPhodiJet_InvMass_up_2btag","h_diPhodiJet_InvMass_up_2btag",100,0.,1000.);
   TH1F* h_diPhodiJet_InvMass_down_2btag = new TH1F("h_diPhodiJet_InvMass_down_2btag","h_diPhodiJet_InvMass_down_2btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_05up_2btag = new TH1F("h_diPhodiJet_InvMass_05up_2btag","h_diPhodiJet_InvMass_05up_2btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_15up_2btag = new TH1F("h_diPhodiJet_InvMass_15up_2btag","h_diPhodiJet_InvMass_15up_2btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_20up_2btag = new TH1F("h_diPhodiJet_InvMass_20up_2btag","h_diPhodiJet_InvMass_20up_2btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_05down_2btag = new TH1F("h_diPhodiJet_InvMass_05down_2btag","h_diPhodiJet_InvMass_05down_2btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_15down_2btag = new TH1F("h_diPhodiJet_InvMass_15down_2btag","h_diPhodiJet_InvMass_15down_2btag",100,0.,1000.);
+  TH1F* h_diPhodiJet_InvMass_20down_2btag = new TH1F("h_diPhodiJet_InvMass_20down_2btag","h_diPhodiJet_InvMass_20down_2btag",100,0.,1000.);
 
   TH2F* h2_pt1pt2 = new TH2F("h2_pt1pt2","h2_pt1pt2",150,0.,150.,150,0.,150.);
   TH2F* h2_eta1eta2 = new TH2F("h2_eta1eta2","h2_eta1eta2",100,-2.5,2.5,100,-2.5,2.5);
@@ -592,6 +707,9 @@ int main(int argc, char** argv)
   TH2F* h2_jwflav_2btag_b1 = new TH2F("h2_jwflav_2btag_b1","h2_jwflav_2btag_b1",200,0,2,21,0.5,21.5);
   TH2F* h2_jwflav_2btag_b2 = new TH2F("h2_jwflav_2btag_b2","h2_jwflav_2btag_b2",200,0,2,21,0.5,21.5);
   TH2F* h2_csvflav = new TH2F("h2_csvflav","h2_csvflav",200.,0.,1.,21,0.5,21.5);
+
+  TGraphErrors* g_1btag2btag_correletion_up = new TGraphErrors();
+  TGraphErrors* g_1btag2btag_correletion_down = new TGraphErrors();
   
   std::map<int,TLorentzVector*> jetP4;
   std::map<int,TLorentzVector*> phoP4;
@@ -601,6 +719,12 @@ int main(int argc, char** argv)
   std::map<int,float> jet_weight;
   std::map<int,float> jet_weight_max;
   std::map<int,float> jet_weight_min;
+  std::map<int,float> jet_weight_05max;
+  std::map<int,float> jet_weight_05min;
+  std::map<int,float> jet_weight_15max;
+  std::map<int,float> jet_weight_15min;
+  std::map<int,float> jet_weight_20max;
+  std::map<int,float> jet_weight_20min;
   std::map<int,float> jet_flavour;
 
   int n_event = 0;
@@ -624,6 +748,8 @@ int main(int argc, char** argv)
 
   int n_1btag_out = 0;
   int n_1btag_in = 0;
+  int n_1btag_out_c = 0;
+  int n_1btag_in_c = 0;
   int n_2btag_out = 0;
   int n_2btag_in = 0;
 
@@ -637,6 +763,8 @@ int main(int argc, char** argv)
 
           float puRe = evweight;
 
+          if( ientry == 4886) continue;
+
           //if(pu_weight == 0 || weight == 0 || evweight == 0) continue;
 
           int n_good_jets_pre = 0;
@@ -647,6 +775,12 @@ int main(int argc, char** argv)
           float btag_weight = 1.;
           float btag_weight_u = 1.;
           float btag_weight_d = 1.;
+          float btag_weight_20u = 1.;
+          float btag_weight_20d = 1.;
+          float btag_weight_05u = 1.;
+          float btag_weight_05d = 1.;
+          float btag_weight_15u = 1.;
+          float btag_weight_15d = 1.;
 
 
           // --------------------------------------------------------------------------------
@@ -956,6 +1090,12 @@ int main(int argc, char** argv)
               if(dR.at(0) < 0.3) jet_weight[jj] = PREjet_weight[lumis][event].at(dR_map[dR.at(0)]);
               if(dR.at(0) < 0.3) jet_weight_max[jj] = PREjet_weight_max[lumis][event].at(dR_map[dR.at(0)]);
               if(dR.at(0) < 0.3) jet_weight_min[jj] = PREjet_weight_min[lumis][event].at(dR_map[dR.at(0)]);
+              if(dR.at(0) < 0.3) jet_weight_05max[jj] = PREjet_weight_05max[lumis][event].at(dR_map[dR.at(0)]);
+              if(dR.at(0) < 0.3) jet_weight_05min[jj] = PREjet_weight_05min[lumis][event].at(dR_map[dR.at(0)]);
+              if(dR.at(0) < 0.3) jet_weight_15max[jj] = PREjet_weight_15max[lumis][event].at(dR_map[dR.at(0)]);
+              if(dR.at(0) < 0.3) jet_weight_15min[jj] = PREjet_weight_15min[lumis][event].at(dR_map[dR.at(0)]);
+              if(dR.at(0) < 0.3) jet_weight_20max[jj] = PREjet_weight_20max[lumis][event].at(dR_map[dR.at(0)]);
+              if(dR.at(0) < 0.3) jet_weight_20min[jj] = PREjet_weight_20min[lumis][event].at(dR_map[dR.at(0)]);
               if(dR.at(0) < 0.3) jet_flavour[jj] = PREjet_flavour[lumis][event].at(dR_map[dR.at(0)]);
               
               dR.clear();
@@ -963,19 +1103,59 @@ int main(int argc, char** argv)
               
           }
         
+          float rho = 0;
+          if((jet_flavour[j1] == 5 && jet_flavour[j2] == 4) || (jet_flavour[j1] == 4 && jet_flavour[j2] == 5) || (jet_flavour[j1] == 5 && jet_flavour[j2] == 5) || (jet_flavour[j1] == 4 && jet_flavour[j2] == 4) || (jet_flavour[j1] != 5 && jet_flavour[j2] != 4) || (jet_flavour[j1] != 4 && jet_flavour[j2] != 5) || (jet_flavour[j1] != 5 && jet_flavour[j2] != 5) || (jet_flavour[j1] != 4 && jet_flavour[j2] != 4)) rho = 1.;
+            
+          btag_weight = jet_weight[j1]*jet_weight[j2];
+          float err1_up = fabs(jet_weight_max[j1]-jet_weight[j1]);
+          float err1_down = fabs(jet_weight_min[j1]-jet_weight[j1]);
+          float err2_up = fabs(jet_weight_max[j2]-jet_weight[j2]);
+          float err2_down = fabs(jet_weight_min[j2]-jet_weight[j2]);
+          float weight_error_up = weight_err(jet_weight[j1],err1_up,jet_weight[j2],err2_up,btag_weight,rho);
+          float weight_error_down = weight_err(jet_weight[j1],err1_down,jet_weight[j2],err2_down,btag_weight,rho);
+             
+          btag_weight_u = btag_weight+weight_error_up;
+          btag_weight_d = btag_weight-weight_error_down;
+
+          err1_up = fabs(jet_weight_05max[j1]-jet_weight[j1]);
+          err1_down = fabs(jet_weight_05min[j1]-jet_weight[j1]);
+          err2_up = fabs(jet_weight_05max[j2]-jet_weight[j2]);
+          err2_down = fabs(jet_weight_05min[j2]-jet_weight[j2]);
+          weight_error_up = weight_err(jet_weight[j1],err1_up,jet_weight[j2],err2_up,btag_weight,rho);
+          weight_error_down = weight_err(jet_weight[j1],err1_down,jet_weight[j2],err2_down,btag_weight,rho);
+  
+          btag_weight_05u = btag_weight+weight_error_up;
+          btag_weight_05d = btag_weight-weight_error_down;
+
+          //if( ientry == 4886) std::cout << ientry << " - " << err1_up << " - " << err1_down << " - " << err2_up << " - " << err2_down << " - " << weight_error_up << " - " << weight_error_down << " - " << btag_weight << " - " << btag_weight_05u << " - " << btag_weight_05d << std::endl;
+          //if( ientry == 4886) std::cout << ientry << " - " << jet_weight[j1] << " - " << jet_weight_max[j1] << " - " << jet_weight_min[j1] << " - " << jet_weight_05max[j1] << " - " << jet_weight_05min[j1] << " - " << jet_weight[j2] << " - " << jet_weight_max[j2] << " - " << jet_weight_min[j2] << " - " << jet_weight_05max[j2] << " - " << jet_weight_05min[j2] << " - " << weight_error_up << " - " << weight_error_down << " - " << btag_weight << " - " << btag_weight_05u << " - " << btag_weight_05d << std::endl;
+
+          err1_up = fabs(jet_weight_15max[j1]-jet_weight[j1]);
+          err1_down = fabs(jet_weight_15min[j1]-jet_weight[j1]);
+          err2_up = fabs(jet_weight_15max[j2]-jet_weight[j2]);
+          err2_down = fabs(jet_weight_15min[j2]-jet_weight[j2]);
+          weight_error_up = weight_err(jet_weight[j1],err1_up,jet_weight[j2],err2_up,btag_weight,rho);
+          weight_error_down = weight_err(jet_weight[j1],err1_down,jet_weight[j2],err2_down,btag_weight,rho);
+  
+          btag_weight_15u = btag_weight+weight_error_up;
+          btag_weight_15d = btag_weight-weight_error_down;
+
+          err1_up = fabs(jet_weight_20max[j1]-jet_weight[j1]);
+          err1_down = fabs(jet_weight_20min[j1]-jet_weight[j1]);
+          err2_up = fabs(jet_weight_20max[j2]-jet_weight[j2]);
+          err2_down = fabs(jet_weight_20min[j2]-jet_weight[j2]);
+          weight_error_up = weight_err(jet_weight[j1],err1_up,jet_weight[j2],err2_up,btag_weight,rho);
+          weight_error_down = weight_err(jet_weight[j1],err1_down,jet_weight[j2],err2_down,btag_weight,rho);
+  
+          btag_weight_20u = btag_weight+weight_error_up;
+          btag_weight_20d = btag_weight-weight_error_down;
           
-          for(int jj = 0; jj < 4; jj++){
-               
-              if(jj != j1 && jj != j2) continue;
-
-              btag_weight =  btag_weight*jet_weight[jj];
-              btag_weight_u =  btag_weight_u*jet_weight_max[jj];
-              btag_weight_d =  btag_weight_d*jet_weight_min[jj];
-
-          }
-
           if(n_b_jets == 1 && btagged[j1] == true && fabs(jet_flavour[j1]) != 5) n_1btag_out++;
           if(n_b_jets == 1 && btagged[j2] == true && fabs(jet_flavour[j2]) != 5) n_1btag_out++;
+          if(n_b_jets == 1 && btagged[j1] == true && fabs(jet_flavour[j1]) == 4) n_1btag_out_c++;
+          if(n_b_jets == 1 && btagged[j2] == true && fabs(jet_flavour[j2]) == 4) n_1btag_out_c++;
+          if(n_b_jets == 1 && btagged[j1] == false && fabs(jet_flavour[j1]) == 4) n_1btag_in_c++;
+          if(n_b_jets == 1 && btagged[j2] == false && fabs(jet_flavour[j2]) == 4) n_1btag_in_c++;
           if(n_b_jets == 1 && btagged[j1] != true && fabs(jet_flavour[j1]) == 5) n_1btag_in++;
           if(n_b_jets == 1 && btagged[j2] != true && fabs(jet_flavour[j2]) == 5) n_1btag_in++;
           if(n_b_jets >= 2 && fabs(jet_flavour[j1]) != 5) n_2btag_out++;
@@ -1008,6 +1188,13 @@ int main(int argc, char** argv)
              h_diPhodiJet_InvMass_1btag->Fill(invMass_Mggjj,puRe*btag_weight);
              h_diPhodiJet_InvMass_up_1btag->Fill(invMass_Mggjj,puRe*btag_weight_u);
              h_diPhodiJet_InvMass_down_1btag->Fill(invMass_Mggjj,puRe*btag_weight_d);
+             //std::cout << ientry << " - " << puRe*btag_weight_05u << " - " << puRe*btag_weight_05d << std::endl;
+             h_diPhodiJet_InvMass_05up_1btag->Fill(invMass_Mggjj,puRe*btag_weight_05u);
+             h_diPhodiJet_InvMass_05down_1btag->Fill(invMass_Mggjj,puRe*btag_weight_05d);
+             h_diPhodiJet_InvMass_15up_1btag->Fill(invMass_Mggjj,puRe*btag_weight_15u);
+             h_diPhodiJet_InvMass_15down_1btag->Fill(invMass_Mggjj,puRe*btag_weight_15d);
+             h_diPhodiJet_InvMass_20up_1btag->Fill(invMass_Mggjj,puRe*btag_weight_20u);
+             h_diPhodiJet_InvMass_20down_1btag->Fill(invMass_Mggjj,puRe*btag_weight_20d);
           }
 
           if(n_b_jets >= 2){
@@ -1015,6 +1202,12 @@ int main(int argc, char** argv)
              h_diPhodiJet_InvMass_2btag->Fill(invMass_Mggjj,puRe*btag_weight);
              h_diPhodiJet_InvMass_up_2btag->Fill(invMass_Mggjj,puRe*btag_weight_u);
              h_diPhodiJet_InvMass_down_2btag->Fill(invMass_Mggjj,puRe*btag_weight_d);
+             h_diPhodiJet_InvMass_05up_2btag->Fill(invMass_Mggjj,puRe*btag_weight_05u);
+             h_diPhodiJet_InvMass_05down_2btag->Fill(invMass_Mggjj,puRe*btag_weight_05d);
+             h_diPhodiJet_InvMass_15up_2btag->Fill(invMass_Mggjj,puRe*btag_weight_15u);
+             h_diPhodiJet_InvMass_15down_2btag->Fill(invMass_Mggjj,puRe*btag_weight_15d);
+             h_diPhodiJet_InvMass_20up_2btag->Fill(invMass_Mggjj,puRe*btag_weight_20u);
+             h_diPhodiJet_InvMass_20down_2btag->Fill(invMass_Mggjj,puRe*btag_weight_20d);
           }
 
           h2_pt1pt2->Fill(jetP4[j1]->Pt(),jetP4[j2]->Pt());
@@ -1073,7 +1266,7 @@ int main(int argc, char** argv)
   }
 
   std::cout << "SELECTION: " << n_event << " - " << n_good_jets_total  << " - " << n_flav_jets << " - " << n_out << std::endl;
-  std::cout << "SELECTION: " << n_1btag_out << " - " << n_1btag_in << " - " << n_2btag_out << " - " << n_2btag_in << std::endl;
+  //std::cout << "SELECTION: " << n_1btag_out << " - " << n_1btag_in << " - " << n_1btag_out_c << " - " << n_1btag_in_c <<  " - " << n_2btag_out << " - " << n_2btag_in << std::endl;
   std::cout << "Integral UP 1b: " << h_diPhodiJet_InvMass_up_1btag->Integral() << std::endl;
   std::cout << "Integral Medium 1b: " << h_diPhodiJet_InvMass_1btag->Integral() << std::endl;
   std::cout << "Integral DOWN 1b: " << h_diPhodiJet_InvMass_down_1btag->Integral() << std::endl;
@@ -1082,8 +1275,26 @@ int main(int argc, char** argv)
   std::cout << "Integral DOWN 2b: " << h_diPhodiJet_InvMass_down_2btag->Integral() << std::endl;
   std::cout << "Integral old 1b: " << h_diPhodiJet_InvMass_old_1btag->Integral() << std::endl;
   std::cout << "Integral old 2b: " << h_diPhodiJet_InvMass_old_2btag->Integral() << std::endl;
+
+  std::cout << "Integrals UP-1btag: " << h_diPhodiJet_InvMass_05up_1btag->Integral() << " - " << h_diPhodiJet_InvMass_up_1btag->Integral() << " - " << h_diPhodiJet_InvMass_15up_1btag->Integral() << " - " << h_diPhodiJet_InvMass_20up_1btag->Integral() << std::endl;
+  std::cout << "Integrals DOWN-1btag: " << h_diPhodiJet_InvMass_05down_1btag->Integral() << " - " << h_diPhodiJet_InvMass_down_1btag->Integral() << " - " << h_diPhodiJet_InvMass_15down_1btag->Integral() << " - " << h_diPhodiJet_InvMass_20down_1btag->Integral() << std::endl;
+  std::cout << "Integrals UP-2btag: " << h_diPhodiJet_InvMass_05up_2btag->Integral() << " - " << h_diPhodiJet_InvMass_up_2btag->Integral() << " - " << h_diPhodiJet_InvMass_15up_2btag->Integral() << " - " << h_diPhodiJet_InvMass_20up_2btag->Integral() << std::endl;
+  std::cout << "Integrals DOWN-2btag: " << h_diPhodiJet_InvMass_05down_2btag->Integral() << " - " << h_diPhodiJet_InvMass_down_2btag->Integral() << " - " << h_diPhodiJet_InvMass_15down_2btag->Integral() << " - " << h_diPhodiJet_InvMass_20down_2btag->Integral() << std::endl;
   
+  g_1btag2btag_correletion_up->SetPoint(0,h_diPhodiJet_InvMass_05up_1btag->Integral(),h_diPhodiJet_InvMass_05up_2btag->Integral());
+  g_1btag2btag_correletion_up->SetPoint(1,h_diPhodiJet_InvMass_up_1btag->Integral(),h_diPhodiJet_InvMass_up_2btag->Integral());
+  g_1btag2btag_correletion_up->SetPoint(2,h_diPhodiJet_InvMass_15up_1btag->Integral(),h_diPhodiJet_InvMass_15up_2btag->Integral());
+  g_1btag2btag_correletion_up->SetPoint(3,h_diPhodiJet_InvMass_20up_1btag->Integral(),h_diPhodiJet_InvMass_20up_2btag->Integral());
+
+  g_1btag2btag_correletion_down->SetPoint(0,h_diPhodiJet_InvMass_05down_1btag->Integral(),h_diPhodiJet_InvMass_05down_2btag->Integral());
+  g_1btag2btag_correletion_down->SetPoint(1,h_diPhodiJet_InvMass_down_1btag->Integral(),h_diPhodiJet_InvMass_down_2btag->Integral());
+  g_1btag2btag_correletion_down->SetPoint(2,h_diPhodiJet_InvMass_15down_1btag->Integral(),h_diPhodiJet_InvMass_15down_2btag->Integral());
+  g_1btag2btag_correletion_down->SetPoint(3,h_diPhodiJet_InvMass_20down_1btag->Integral(),h_diPhodiJet_InvMass_20down_2btag->Integral());
+
   
+  g_1btag2btag_correletion_up->Fit("pol1");
+  g_1btag2btag_correletion_down->Fit("pol1");
+
   TFile* output = new TFile(outputName.c_str(),"RECREATE");
   output->cd();
   h_btagSF_weights->Write();
@@ -1133,6 +1344,8 @@ int main(int argc, char** argv)
   h2_jwflav_2btag_b1->Write();
   h2_jwflav_2btag_b2->Write();
   h2_csvflav->Write();
+  g_1btag2btag_correletion_up->Write("g_1btag2btag_correletion_up");
+  g_1btag2btag_correletion_down->Write("g_1btag2btag_correletion_down");
   output->Close();
 }
 
@@ -1166,6 +1379,13 @@ bool passCutBasedJetId(int jet) {
   }
 
   return isGood;
+}
+
+float weight_err(float jet1, float jet1_err,float jet2, float jet2_err,float weight, float rho){
+      
+      float rel_err1 = jet1_err/jet1;
+      float rel_err2 = jet2_err/jet2;
+      return weight*sqrt(rel_err1*rel_err1+rel_err2*rel_err2+2*rel_err1*rel_err2*rho);
 }
 
 

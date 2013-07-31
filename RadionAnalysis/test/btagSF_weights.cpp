@@ -2,7 +2,6 @@
 #include "PUreweightingUtils.h"
 #include "ConfigParser.h"
 #include "ParserUtils.h"
-//#include "Preselection.h"
 #include "setTDRStyle.h"
 #include "drawPlotsUtils.h"
 
@@ -160,15 +159,15 @@ int main(int argc, char** argv)
 
   TF1* SFudsg_CSVM_00_08_max = (TF1*)btagSF_File->Get("SFudsg_CSVM_00_08_max");
   TF1* SFudsg_CSVM_00_08_mean = (TF1*)btagSF_File->Get("SFudsg_CSVM_00_08_mean");
-  TF1* SFudsg_CSVM_00_08_min = (TF1*)btagSF_File->Get("SFudsg_CSVM_00_08_max");
+  TF1* SFudsg_CSVM_00_08_min = (TF1*)btagSF_File->Get("SFudsg_CSVM_00_08_min");
    
   TF1* SFudsg_CSVM_08_16_max = (TF1*)btagSF_File->Get("SFudsg_CSVM_08_16_max");
   TF1* SFudsg_CSVM_08_16_mean = (TF1*)btagSF_File->Get("SFudsg_CSVM_08_16_mean");
-  TF1* SFudsg_CSVM_08_16_min = (TF1*)btagSF_File->Get("SFudsg_CSVM_08_16_max");
+  TF1* SFudsg_CSVM_08_16_min = (TF1*)btagSF_File->Get("SFudsg_CSVM_08_16_min");
    
   TF1* SFudsg_CSVM_16_24_max = (TF1*)btagSF_File->Get("SFudsg_CSVM_16_24_max");
   TF1* SFudsg_CSVM_16_24_mean = (TF1*)btagSF_File->Get("SFudsg_CSVM_16_24_mean");
-  TF1* SFudsg_CSVM_16_24_min = (TF1*)btagSF_File->Get("SFudsg_CSVM_16_24_max");
+  TF1* SFudsg_CSVM_16_24_min = (TF1*)btagSF_File->Get("SFudsg_CSVM_16_24_min");
 
   TFile* btagEff_File = new TFile(inputEff.c_str(),"READ");
   TFile* btagEff_File_tot = new TFile(inputEff_tot.c_str(),"READ");
@@ -275,6 +274,12 @@ int main(int argc, char** argv)
   float         j1_weight;
   float         j1_weight_min;
   float         j1_weight_max;
+  float         j1_weight_05min;
+  float         j1_weight_05max;
+  float         j1_weight_15min;
+  float         j1_weight_15max;
+  float         j1_weight_20min;
+  float         j1_weight_20max;
   float         j1_csvBtag;
   float         j1_jetProbBtag; 
   float         j1_emfrac;
@@ -294,6 +299,12 @@ int main(int argc, char** argv)
   float         j2_weight;
   float         j2_weight_min;
   float         j2_weight_max;
+  float         j2_weight_05min;
+  float         j2_weight_05max;
+  float         j2_weight_15min;
+  float         j2_weight_15max;
+  float         j2_weight_20min;
+  float         j2_weight_20max;
   float         j2_csvBtag;
   float         j2_jetProbBtag;
   float         j2_emfrac;
@@ -313,6 +324,12 @@ int main(int argc, char** argv)
   float         j3_weight;
   float         j3_weight_min;
   float         j3_weight_max;
+  float         j3_weight_05min;
+  float         j3_weight_05max;
+  float         j3_weight_15min;
+  float         j3_weight_15max;
+  float         j3_weight_20min;
+  float         j3_weight_20max;
   float         j3_csvBtag;
   float         j3_jetProbBtag;
   float         j3_emfrac;
@@ -332,6 +349,12 @@ int main(int argc, char** argv)
   float         j4_weight;
   float         j4_weight_min;
   float         j4_weight_max;
+  float         j4_weight_05min;
+  float         j4_weight_05max;
+  float         j4_weight_15min;
+  float         j4_weight_15max;
+  float         j4_weight_20min;
+  float         j4_weight_20max;
   float         j4_csvBtag;
   float         j4_jetProbBtag;
   float         j4_emfrac;
@@ -354,6 +377,12 @@ int main(int argc, char** argv)
    outTree -> Branch("j1_weight",    &j1_weight,        "j1_weight/F");
    outTree -> Branch("j1_weight_min",  &j1_weight_min,  "j1_weight_min/F");
    outTree -> Branch("j1_weight_max",  &j1_weight_max,  "j1_weight_max/F");
+   outTree -> Branch("j1_weight_05min",  &j1_weight_05min,  "j1_weight_05min/F");
+   outTree -> Branch("j1_weight_05max",  &j1_weight_05max,  "j1_weight_05max/F");
+   outTree -> Branch("j1_weight_15min",  &j1_weight_15min,  "j1_weight_15min/F");
+   outTree -> Branch("j1_weight_15max",  &j1_weight_15max,  "j1_weight_15max/F");
+   outTree -> Branch("j1_weight_20min",  &j1_weight_20min,  "j1_weight_20min/F");
+   outTree -> Branch("j1_weight_20max",  &j1_weight_20max,  "j1_weight_20max/F");
    outTree -> Branch("j2_pt",    &j2_pt_outtree,        "j2_pt/F");
    outTree -> Branch("j2_e",    &j2_e_outtree,          "j2_e/F");
    outTree -> Branch("j2_eta",    &j2_eta_outtree,      "j2_eta/F");
@@ -362,6 +391,12 @@ int main(int argc, char** argv)
    outTree -> Branch("j2_weight",    &j2_weight,        "j2_weight/F");
    outTree -> Branch("j2_weight_min",  &j2_weight_min,  "j2_weight_min/F");
    outTree -> Branch("j2_weight_max",  &j2_weight_max,  "j2_weight_max/F");
+   outTree -> Branch("j2_weight_05min",  &j2_weight_05min,  "j2_weight_05min/F");
+   outTree -> Branch("j2_weight_05max",  &j2_weight_05max,  "j2_weight_05max/F");
+   outTree -> Branch("j2_weight_15min",  &j2_weight_15min,  "j2_weight_15min/F");
+   outTree -> Branch("j2_weight_15max",  &j2_weight_15max,  "j2_weight_15max/F");
+   outTree -> Branch("j2_weight_20min",  &j2_weight_20min,  "j2_weight_20min/F");
+   outTree -> Branch("j2_weight_20max",  &j2_weight_20max,  "j2_weight_20max/F");
    outTree -> Branch("j3_pt",    &j3_pt_outtree,        "j3_pt/F");
    outTree -> Branch("j3_e",    &j3_e_outtree,          "j3_e/F");
    outTree -> Branch("j3_eta",    &j3_eta_outtree,      "j3_eta/F");
@@ -370,6 +405,12 @@ int main(int argc, char** argv)
    outTree -> Branch("j3_weight",    &j3_weight,        "j3_weight/F");
    outTree -> Branch("j3_weight_min",  &j3_weight_min,  "j3_weight_min/F");
    outTree -> Branch("j3_weight_max",  &j3_weight_max,  "j3_weight_max/F");
+   outTree -> Branch("j3_weight_05min",  &j3_weight_05min,  "j3_weight_05min/F");
+   outTree -> Branch("j3_weight_05max",  &j3_weight_05max,  "j3_weight_05max/F");
+   outTree -> Branch("j3_weight_15min",  &j3_weight_15min,  "j3_weight_15min/F");
+   outTree -> Branch("j3_weight_15max",  &j3_weight_15max,  "j3_weight_15max/F");
+   outTree -> Branch("j3_weight_20min",  &j3_weight_20min,  "j3_weight_20min/F");
+   outTree -> Branch("j3_weight_20max",  &j3_weight_20max,  "j3_weight_20max/F");
    outTree -> Branch("j4_pt",    &j4_pt_outtree,        "j4_pt/F");
    outTree -> Branch("j4_e",    &j4_e_outtree,          "j4_e/F");
    outTree -> Branch("j4_eta",    &j4_eta_outtree,      "j4_eta/F");
@@ -378,6 +419,12 @@ int main(int argc, char** argv)
    outTree -> Branch("j4_weight",    &j4_weight,        "j4_weight/F");
    outTree -> Branch("j4_weight_min",  &j4_weight_min,  "j4_weight_min/F");
    outTree -> Branch("j4_weight_max",  &j4_weight_max,  "j4_weight_max/F");
+   outTree -> Branch("j4_weight_05min",  &j4_weight_05min,  "j4_weight_05min/F");
+   outTree -> Branch("j4_weight_05max",  &j4_weight_05max,  "j4_weight_05max/F");
+   outTree -> Branch("j4_weight_15min",  &j4_weight_15min,  "j4_weight_15min/F");
+   outTree -> Branch("j4_weight_15max",  &j4_weight_15max,  "j4_weight_15max/F");
+   outTree -> Branch("j4_weight_20min",  &j4_weight_20min,  "j4_weight_20min/F");
+   outTree -> Branch("j4_weight_20max",  &j4_weight_20max,  "j4_weight_20max/F");
    
   
   for(int ii = 0; ii < pos_total; ii++){
@@ -939,6 +986,12 @@ int main(int argc, char** argv)
           float weight[4] = {1.,1.,1.,1.};
           float weight_err_up[4] = {1.,1.,1.,1.};
           float weight_err_down[4] = {1.,1.,1.,1.};
+          float weight_err_05up[4] = {1.,1.,1.,1.};
+          float weight_err_05down[4] = {1.,1.,1.,1.};
+          float weight_err_15up[4] = {1.,1.,1.,1.};
+          float weight_err_15down[4] = {1.,1.,1.,1.};
+          float weight_err_20up[4] = {1.,1.,1.,1.};
+          float weight_err_20down[4] = {1.,1.,1.,1.};
           
           for(int jj = 0; jj < 4; jj++){
 
@@ -987,12 +1040,24 @@ int main(int argc, char** argv)
                  weight[jj] = sf[jj];
                  weight_err_up[jj] = sf_err_up[jj];
                  weight_err_down[jj] = sf_err_down[jj];
+                 weight_err_05up[jj] = 0.5*sf_err_up[jj];
+                 weight_err_05down[jj] = 0.5*sf_err_down[jj];
+                 weight_err_15up[jj] = 1.5*sf_err_up[jj];
+                 weight_err_15down[jj] = 1.5*sf_err_down[jj];
+                 weight_err_20up[jj] = 2.*sf_err_up[jj];
+                 weight_err_20down[jj] = 2.*sf_err_down[jj];
               }else{
                  weight[jj] = (1.-sf[jj]*eff[jj])/(1.-eff[jj]);
                  weight_err_up[jj] = jet_weight_err(eff[jj], eff_err[jj], sf[jj], sf_err_up[jj]);
                  weight_err_down[jj] = jet_weight_err(eff[jj], eff_err[jj], sf[jj], sf_err_down[jj]);
+                 weight_err_05up[jj] = jet_weight_err(eff[jj], 0.5*eff_err[jj], sf[jj], 0.5*sf_err_up[jj]);
+                 weight_err_05down[jj] = jet_weight_err(eff[jj], 0.5*eff_err[jj], sf[jj], 0.5*sf_err_down[jj]);
+                 weight_err_15up[jj] = jet_weight_err(eff[jj], 1.5*eff_err[jj], sf[jj], 1.5*sf_err_up[jj]);
+                 weight_err_15down[jj] = jet_weight_err(eff[jj], 1.5*eff_err[jj], sf[jj], 1.5*sf_err_down[jj]);
+                 weight_err_20up[jj] = jet_weight_err(eff[jj], 2.*eff_err[jj], sf[jj], 2.*sf_err_up[jj]);
+                 weight_err_20down[jj] = jet_weight_err(eff[jj], 2.*eff_err[jj], sf[jj], 2.*sf_err_down[jj]);
 
-                 //std::cout << ientry << " - " << jj << " - " << eff[jj] << " - " << eff_err[jj] << " - " << sf[jj] << " - " << sf_err_up[jj] << " - " << weight[jj] << " - " << weight_err_up[jj] << std::endl;
+                 //if(sf_err_down[jj] != sf_err_up[jj])std::cout << ientry << " - " << jj << " - " << eff[jj] << " - " << eff_err[jj] << " - " << sf[jj] << " - " << sf_err_up[jj] << " - " << weight[jj] << " - " << weight_err_up[jj] << " - " << weight_err_down[jj] << " - " << sf_err_up[jj] << " - " << sf_err_down[jj] << std::endl;
               }
                 
               if(fabs(jet_flavour[jj]) == 0){
@@ -1016,8 +1081,14 @@ int main(int argc, char** argv)
                  j1_phi_outtree = jetP4[jj]->Phi();
                  j1_flavour = jet_flavour[jj];
                  j1_weight_max = weight[jj]+weight_err_up[jj];
+                 j1_weight_05max = weight[jj]+weight_err_05up[jj];
+                 j1_weight_15max = weight[jj]+weight_err_15up[jj];
+                 j1_weight_20max = weight[jj]+weight_err_20up[jj];
                  j1_weight = weight[jj];
                  j1_weight_min = weight[jj]-weight_err_down[jj];
+                 j1_weight_05min = weight[jj]-weight_err_05down[jj];
+                 j1_weight_15min = weight[jj]-weight_err_15down[jj];
+                 j1_weight_20min = weight[jj]-weight_err_20down[jj];
               }
               if(jj == 1){
                  j2_pt_outtree = jetP4[jj]->Pt();
@@ -1026,8 +1097,14 @@ int main(int argc, char** argv)
                  j2_phi_outtree = jetP4[jj]->Phi();
                  j2_flavour = jet_flavour[jj];
                  j2_weight_max = weight[jj]+weight_err_up[jj];
+                 j2_weight_05max = weight[jj]+weight_err_05up[jj];
+                 j2_weight_15max = weight[jj]+weight_err_15up[jj];
+                 j2_weight_20max = weight[jj]+weight_err_20up[jj];
                  j2_weight = weight[jj];
                  j2_weight_min = weight[jj]-weight_err_down[jj];
+                 j2_weight_05min = weight[jj]-weight_err_05down[jj];
+                 j2_weight_15min = weight[jj]-weight_err_15down[jj];
+                 j2_weight_20min = weight[jj]-weight_err_20down[jj];
               }
               if(jj == 2){
                  j3_pt_outtree = jetP4[jj]->Pt();
@@ -1036,8 +1113,14 @@ int main(int argc, char** argv)
                  j3_phi_outtree = jetP4[jj]->Phi();
                  j3_flavour = jet_flavour[jj];
                  j3_weight_max = weight[jj]+weight_err_up[jj];
+                 j3_weight_05max = weight[jj]+weight_err_05up[jj];
+                 j3_weight_15max = weight[jj]+weight_err_15up[jj];
+                 j3_weight_20max = weight[jj]+weight_err_20up[jj];
                  j3_weight = weight[jj];
                  j3_weight_min = weight[jj]-weight_err_down[jj];
+                 j3_weight_05min = weight[jj]-weight_err_05down[jj];
+                 j3_weight_15min = weight[jj]-weight_err_15down[jj];
+                 j3_weight_20min = weight[jj]-weight_err_20down[jj];
               }
               if(jj == 3){
                  j4_pt_outtree = jetP4[jj]->Pt();
@@ -1046,8 +1129,14 @@ int main(int argc, char** argv)
                  j4_phi_outtree = jetP4[jj]->Phi();
                  j4_flavour = jet_flavour[jj];
                  j4_weight_max = weight[jj]+weight_err_up[jj];
+                 j4_weight_05max = weight[jj]+weight_err_05up[jj];
+                 j4_weight_15max = weight[jj]+weight_err_15up[jj];
+                 j4_weight_20max = weight[jj]+weight_err_20up[jj];
                  j4_weight = weight[jj];
                  j4_weight_min = weight[jj]-weight_err_down[jj];
+                 j4_weight_05min = weight[jj]-weight_err_05down[jj];
+                 j4_weight_15min = weight[jj]-weight_err_15down[jj];
+                 j4_weight_20min = weight[jj]-weight_err_20down[jj];
               }
              
           }
